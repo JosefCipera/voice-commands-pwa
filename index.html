@@ -7,32 +7,22 @@
   <link rel="manifest" href="manifest.json">
   <title>Voice Commands PWA</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 20px;
-    }
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
-      margin: 10px;
-      border: none;
-      background-color: #4CAF50;
-      color: white;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    button:disabled {
-      background-color: #ccc;
-    }
-    #output {
-      margin-top: 20px;
-      font-size: 18px;
-      color: #333;
-    }
-  </style>
-</head>
-<body>
+    <body>
+  <h1>Hlasové povely</h1>
+  <button id="start-btn">Povolit záznam</button>
+  <button id="stop-btn">Zastavit záznam</button>
+  <div id="output"></div>
+
+  <h2>Veřejný dashboard</h2>
+  <!-- Zobrazení public stránky v iframe -->
+  <iframe 
+    id="public-page"
+    src="https://app.tabidoo.cloud/public-dashboard/xx6481xx7f"
+    style="width: 100%; height: 500px; border: none;"
+    title="Public Dashboard"></iframe>
+
+  <script src="app.js"></script>
+</body>
   <h1>Hlasové povely</h1>
   <button id="start-btn">Zahájit záznam</button>
   <button id="stop-btn" disabled>Zastavit záznam</button>
