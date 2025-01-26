@@ -1,50 +1,59 @@
-const startButton = document.getElementById('start-btn');
-const stopButton = document.getElementById('stop-btn');
-const output = document.getElementById('output');
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hlasové povely</title>
+  <link rel="manifest" href="manifest.json">
+</head>
+<body>
+  <h1>Hlasové povely</h1>
+  <button id="start-btn">Povolit záznam</button>
+  <button id="stop-btn">Zastavit záznam</button>
+  <div id="output"></div>
 
-let recognition;
+  <h2>Veřejný dashboard</h2>
+  <!-- Zobrazení public stránky v iframe -->
+  <iframe 
+    id="public-page"
+    style="width: 100%; height: 500px; border: none;"
+    title="Public Dashboard"></iframe>
 
-// Zkontroluj, zda je podporováno Web Speech API
-if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  recognition = new SpeechRecognition();
-  recognition.lang = 'cs-CZ'; // Nastav jazyk na češtinu
-  recognition.interimResults = false;
-  recognition.maxAlternatives = 1;
+  <script>
+    // Inicializace rozpoznávání hlasu
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = 'cs-CZ'; // Nastavení češtiny
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
 
-  // Zahájení záznamu
-  startButton.addEventListener('click', () => {
-    recognition.start();
-    startButton.disabled = true;
-    stopButton.disabled = false;
-    output.textContent = 'Poslouchám...';
-  });
+    // Události pro tlačítka
+    document.getElementById('start-btn').addEventListener('click', () => {
+      recognition.start();
+      console.log('Rozpoznávání spuštěno...');
+    });
 
-  // Zastavení záznamu
-  stopButton.addEventListener('click', () => {
-    recognition.stop();
-    startButton.disabled = false;
-    stopButton.disabled = true;
-  });
+    document.getElementById('stop-btn').addEventListener('click', () => {
+      recognition.stop();
+      console.log('Rozpoznávání zastaveno.');
+    });
 
-  // Když je záznam ukončen
-  recognition.addEventListener('result', (event) => {
-    const transcript = event.results[0][0].transcript;
-    output.textContent = `Rozpoznaný text: "${transcript}"`;
+    // Zpracování výsledků rozpoznávání
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      document.getElementById('output').innerText = `Rozpoznáno: ${transcript}`;
+      console.log(`Rozpoznaný text: ${transcript}`);
 
-    // Příklad akce na základě hlasového povelu
-    if (transcript.toLowerCase().includes('ahoj')) {
-      alert('Zdravím vás!');
-    }
-  });
+      // Počkej 5 sekund a přejdi na veřejnou stránku
+      setTimeout(() => {
+        document.getElementById('public-page').src = "https://app.tabidoo.cloud/public-dashboard/xx6481xx7f";
+        console.log('Načítání veřejné stránky...');
+      }, 5000);
+    };
 
-  // Když dojde k chybě
-  recognition.addEventListener('error', (event) => {
-    output.textContent = `Chyba: ${event.error}`;
-    startButton.disabled = false;
-    stopButton.disabled = true;
-  });
-} else {
-  output.textContent = 'Váš prohlížeč nepodporuje Web Speech API.';
-  startButton.disabled = true;
-}
+    recognition.onerror = (event) => {
+      console.error('Chyba při rozpoznávání:', event.error);
+      document.getElementById('output').innerText = `Chyba: ${event.error}`;
+    };
+  </script>
+</body>
+</html>
