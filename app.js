@@ -17,7 +17,8 @@
   <iframe 
     id="public-page"
     style="width: 100%; height: 500px; border: none;"
-    title="Public Dashboard"></iframe>
+    title="Public Dashboard"
+    src="https://app.tabidoo.cloud/public-dashboard/xx6481xx7f"></iframe>
 
   <script>
     // Inicializace rozpoznávání hlasu
