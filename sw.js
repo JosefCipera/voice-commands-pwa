@@ -1,12 +1,12 @@
 // Service Worker pro PWA
 const CACHE_NAME = 'voice-commands-cache-v1';
 const URLS_TO_CACHE = [
-  '/',              // Kořenová stránka
-  '/index.html',    // HTML aplikace
-  '/app.js',        // JavaScript aplikace
-  '/manifest.json', // Manifest soubor
-  '/icon-192x192.png', // Ikona 192x192
-  '/icon-512x512.png'  // Ikona 512x512
+  '/voice-commands-pwa/',              // Kořenová stránka
+  '/voice-commands-pwa/index.html',    // HTML aplikace
+  '/voice-commands-pwa/app.js',        // JavaScript aplikace
+  '/voice-commands-pwa/manifest.json', // Manifest soubor
+  '/voice-commands-pwa/icon-192x192.png', // Ikona 192x192
+  '/voice-commands-pwa/icon-512x512.png'  // Ikona 512x512
 ];
 
 // Instalace Service Workeru
