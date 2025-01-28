@@ -3,23 +3,46 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hlasové povely</title>
-  <link rel="manifest" href="manifest.json">
+  <title>Hlasové příkazy</title>
 </head>
 <body>
-  <h1>Hlasové povely</h1>
-  <button id="start-btn">Povolit záznam</button>
-  <button id="stop-btn">Zastavit záznam</button>
-  <div id="output"></div>
+  <button id="start-speech">🎤 Start</button>
 
-  <h2>Veřejný dashboard</h2>
-  <!-- Zobrazení public stránky v iframe -->
-  <iframe 
-    id="public-page"
-    src="https://app.tabidoo.cloud/public-dashboard/xx6481xx7f"
-    style="width: 100%; height: 500px; border: none;"
-    title="Public Dashboard"></iframe>
+  <!-- JavaScript pro Web Speech API -->
+  <script>
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = 'cs-CZ';
+    recognition.interimResults = false;
 
-  <script src="app.js"></script>
+    document.getElementById('start-speech').addEventListener('click', () => {
+      recognition.start();
+      console.log('Hlasové rozpoznávání spuštěno...');
+    });
+
+    recognition.onresult = (event) => {
+      const command = event.results[0][0].transcript;
+      console.log(`Rozpoznaný příkaz: ${command}`);
+      sendToWebhook(command);
+    };
+
+    function sendToWebhook(command) {
+      const webhookUrl = "https://maker.ifttt.com/trigger/your_event/with/key/your_ifttt_key";
+      const payload = { value1: command };
+
+      fetch(webhookUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      })
+      .then(response => {
+        if (response.ok) {
+          console.log("Příkaz odeslán na webhook!");
+        } else {
+          console.error("Chyba při odesílání na webhook.");
+        }
+      })
+      .catch(error => console.error("Chyba: ", error));
+    }
+  </script>
 </body>
 </html>
