@@ -50,6 +50,23 @@
   .catch(err => console.error("Chyba: ", err));
 }
 
+// Funkce pro načtení URL a přesměrování
+function fetchAndRedirect() {
+  fetch(webhookUrl)
+    .then(response => response.json()) // Očekáváme odpověď ve formátu JSON
+    .then(data => {
+      if (data.url) {
+        window.location.href = data.url; // Přesměrování na danou stránku
+      } else {
+        console.error("Žádná URL v odpovědi:", data);
+      }
+    })
+    .catch(error => console.error("Chyba při načítání URL:", error));
+}
+
+// Volání funkce po načtení stránky
+fetchAndRedirect();
+
   </script>
 </body>
 </html>
