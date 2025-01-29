@@ -26,23 +26,30 @@
     };
 
     function sendToWebhook(command) {
-      const webhookUrl = "https://maker.ifttt.com/trigger/speech_command/json/with/key/c2NysuEUkHUy3dRJmFVx_D";
-      const payload = { value1: command };
+  const webhookUrl = "https://hook.eu1.make.com/7oiexq848aerxmqcztnyvs06qtw31rh6"; // URL vašeho webhooku
 
-      fetch(webhookUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      })
-      .then(response => {
-        if (response.ok) {
-          console.log("Příkaz odeslán na webhook!");
-        } else {
-          console.error("Chyba při odesílání na webhook.");
-        }
-      })
-      .catch(error => console.error("Chyba: ", error));
+  const payload = {
+    command: command, // Textový příkaz
+    source: "PWA app" // Volitelný identifikátor
+  };
+
+  fetch(webhookUrl, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  })
+  .then(response => {
+    if (response.ok) {
+      console.log("Příkaz úspěšně odeslán na webhook!");
+    } else {
+      console.error("Chyba při odesílání na webhook.");
     }
+  })
+  .catch(err => console.error("Chyba: ", err));
+}
+
   </script>
 </body>
 </html>
