@@ -52,22 +52,23 @@
    
 // Funkce pro načtení URL a přesměrování
 function fetchAndRedirect() {
-  fetch(webhookUrl)
+  fetch("https://hook.eu1.make.com/your-webhook-url")
     .then(response => {
       if (!response.ok) {
         throw new Error(`Chyba: ${response.status}`);
       }
-      return response.json(); // Očekáváme, že server vrátí JSON
+      return response.json();
     })
     .then(data => {
+      console.log("Přijatá data:", data);
       if (data.url) {
-        console.log("Přesměrování na:", data.url);
-        window.location.href = data.url; // Přesměrování na veřejnou stránku Tabidoo
+        console.log("🚀 Přesměrování na:", data.url);
+        window.location.href = data.url; // Manuální přesměrování
       } else {
-        console.error("Žádná URL v odpovědi:", data);
+        console.error("❌ Žádná URL v odpovědi:", data);
       }
     })
-    .catch(error => console.error("Chyba při načítání URL:", error));
+    .catch(error => console.error("❌ Chyba při načítání URL:", error));
 }
 
 // Volání funkce po načtení stránky
