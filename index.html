@@ -53,10 +53,16 @@
 // Funkce pro načtení URL a přesměrování
 function fetchAndRedirect() {
   fetch(webhookUrl)
-    .then(response => response.json()) // Očekáváme odpověď ve formátu JSON
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`Chyba: ${response.status}`);
+      }
+      return response.json(); // Očekáváme, že server vrátí JSON
+    })
     .then(data => {
       if (data.url) {
-        window.location.href = data.url; // Přesměrování na danou stránku
+        console.log("Přesměrování na:", data.url);
+        window.location.href = data.url; // Přesměrování na veřejnou stránku Tabidoo
       } else {
         console.error("Žádná URL v odpovědi:", data);
       }
