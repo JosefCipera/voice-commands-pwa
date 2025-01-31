@@ -8,7 +8,6 @@
 <body>
   <button id="start-speech">🎤 Start</button>
 
-  <!-- JavaScript pro Web Speech API -->
   <script>
     const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
     recognition.lang = 'cs-CZ';
@@ -22,49 +21,38 @@
     recognition.onresult = (event) => {
       const command = event.results[0][0].transcript;
       console.log(`Rozpoznaný příkaz: ${command}`);
+      recognition.stop(); // Preventuje nekonečné naslouchání
       sendToWebhook(command);
     };
 
     function sendToWebhook(command) {
-  const webhookUrl = "https://maker.ifttt.com/trigger/speech_command/json/with/key/c2NysuEUkHUy3dRJmFVx_D";
-     // "https://hook.eu1.make.com/7oiexq848aerxmqcztnyvs06qtw31rh6"; // URL vašeho webhooku v make
+      const webhookUrl = "https://maker.ifttt.com/trigger/speech_command/with/key/c2NysuEUkHUy3dRJmFVx_D";
 
-  const payload = {
-    command: command, // Textový příkaz
-    source: "PWA app" // Volitelný identifikátor
-  };
+      const payload = { command: command, source: "PWA app" };
 
-  fetch(webhookUrl, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(payload),
-  })
-  .then(response => {
-    if (response.ok) {
-      console.log("Příkaz úspěšně odeslán na webhook!");
-    } else {
-      console.error("Chyba při odesílání na webhook.");
+      fetch(webhookUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      })
+      .then(response => {
+        if (response.ok) {
+          console.log("Příkaz úspěšně odeslán na webhook!");
+        } else {
+          console.error("Chyba při odesílání na webhook.");
+        }
+      })
+      .catch(err => console.error("Chyba: ", err));
     }
-  })
-  .catch(err => console.error("Chyba: ", err));
-}
-   
-// Funkce pro načtení URL a přesměrování
-function fetchAndRedirect() {
-  fetch("https://hook.eu1.make.com/your-webhook-url")
-    .then(response => {
-      if (!response.ok) {
-        throw new Error(`Chyba: ${response.status}`);
-      }
-      return response.json();
-    })
+
+    // Pokud chceš přesměrování přes Make, použij tento kód:
+    function fetchAndRedirect() {
+  fetch("https://hook.eu1.make.com/7oiexq848aerxmqcztnyvs06qtw31rh6")
+    .then(response => response.json())
     .then(data => {
-      console.log("Přijatá data:", data);
       if (data.url) {
         console.log("🚀 Přesměrování na:", data.url);
-        window.location.href = data.url; // Manuální přesměrování
+        window.location.href = data.url;
       } else {
         console.error("❌ Žádná URL v odpovědi:", data);
       }
