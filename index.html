@@ -47,18 +47,32 @@
     }
 
     // Pokud chceš přesměrování přes Make, použij tento kód:
-    function fetchAndRedirect() {
-  fetch("https://hook.eu1.make.com/7b09prgwkvfvpglmgawszg5golnbgfj8")
-    .then(response => response.json())
-    .then(data => {
-      if (data.url) {
-        console.log("🚀 Přesměrování na:", data.url);
-        window.location.href = data.url;
-      } else {
-        console.error("❌ Žádná URL v odpovědi:", data);
-      }
-    })
-    .catch(error => console.error("❌ Chyba při načítání URL:", error));
+    function fetchAndRedirect(command) {
+  const webhookUrl = "https://hook.eu1.make.com/7b09prgwkvfvpglmgawszg5golnbgfj8";
+  const payload = { command: command, source: "PWA app" };
+
+  fetch(webhookUrl, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error("Chyba při odesílání na webhook.");
+    }
+    return response.json();
+  })
+  .then(data => {
+    if (data.url) {
+      console.log("🚀 Přesměrování na:", data.url);
+      window.location.href = data.url; // Přesměrování na URL
+    } else {
+      console.error("❌ Žádná URL v odpovědi:", data);
+    }
+  })
+  .catch(error => {
+    console.error("❌ Chyba při odesílání na webhook:", error);
+  });
 }
 
 // Volání funkce po načtení stránky
