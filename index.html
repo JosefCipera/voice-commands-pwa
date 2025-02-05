@@ -22,88 +22,46 @@
       const command = event.results[0][0].transcript;
       console.log(`Rozpoznaný příkaz: ${command}`);
       recognition.stop(); // Preventuje nekonečné naslouchání
-      sendToWebhook(command);
+      findURLInTabidoo(command);
     };
 
-    function sendToWebhook(command) {
-      const webhookUrl = "https://app.tabidoo.cloud/api/v2/webhook/wf-app-itingbuild-dbye-wfid-xipakhc261"; // tabidoo
-      // const webhookUrl = "https://hook.eu1.make.com/7b09prgwkvfvpglmgawszg5golnbgfj8";
-      // const webhookUrl = "https://maker.ifttt.com/trigger/speech_command/with/key/c2NysuEUkHUy3dRJmFVx_D";
+    async function findURLInTabidoo(command) {
+      const apiUrl = "https://app.tabidoo.cloud/api/v2/table/Hlasové%20povely/records";
+      const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZTUxZDI5NS1jZDE4LTQ1NzAtYmUyNi1iMGRmNTJkNTk5MmQiLCJ1bmlxdWVfbmFtZSI6ImNpcGVyYUBpdGluZy5jeiIsInB1cnBvc2UiOiJBUElUb2tlbiIsImFwaVRva2VuSWQiOiI4NGQ5MTM4Ni0xMDA3LTQ5ZjEtYWE1Yi0wMmRmOTU5OTEzYTYiLCJuYmYiOjE3Mzg3ODI3NzcsImV4cCI6NDg5NDQ1NjM3NywiaWF0IjoxNzM4NzgyNzc3fQ.uQ4_7xbAOj5JtT9vHFRRA6YrwOTueEEVFO4Zhonzr6s"; // Nahraď skutečným API tokenem
 
-      const payload = { command: command, source: "PWA app" };
+      // Vytvoření dotazu na Tabidoo
+      const query = {
+        filter: { Povel: command },
+      };
 
-      fetch(webhookUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      })
-      .then(response => {
-        if (response.ok) {
-          console.log("Příkaz úspěšně odeslán na webhook!");
-        } else {
-          console.error("Chyba při odesílání na webhook.");
+      try {
+        const response = await fetch(`${apiUrl}?${new URLSearchParams({ filter: JSON.stringify(query.filter) })}`, {
+          method: "GET",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`Chyba API: ${response.status}`);
         }
-      })
-      .catch(err => console.error("Chyba: ", err));
-    }
 
-    async function webhookHandler(request, { log, fetch }) {
-    try {
-        let body = await request.json(); // Načtení dat z webhooku
-        let command = body.command; // Získání povelu z PWA
-        log(`Přijatý hlasový povel: ${command}`);
+        const data = await response.json();
+        console.log("Odpověď z API:", data);
 
-        // Vyhledání odpovídajícího URL v tabulce "Hlasové povely"
-        let records = await getRecords("Hlasové povely", { filter: { Povel: command } });
-
-        if (records.length > 0) {
-            let urlToSend = records[0].URL;
-            log(`Nalezená URL: ${urlToSend}`);
-
-            // Vrácení odpovědi přímo do PWA
-            return new Response(JSON.stringify({ url: urlToSend }), { status: 200 });
+        if (data.records.length > 0) {
+          const urlToRedirect = data.records[0].URL;
+          console.log("🚀 Přesměrování na:", urlToRedirect);
+          window.location.href = urlToRedirect; // Přesměrování na odpovídající URL
         } else {
-            log(`Nebyla nalezena odpovídající URL pro povel: ${command}`);
-            return new Response(JSON.stringify({ error: "Neznámý povel" }), { status: 404 });
+          console.warn("❌ Nebyla nalezena odpovídající URL pro povel:", command);
         }
-    } catch (error) {
-        log(`Chyba při zpracování: ${error.message}`);
-        return new Response(JSON.stringify({ error: "Chyba na serveru" }), { status: 500 });
+
+      } catch (error) {
+        console.error("❌ Chyba při komunikaci s Tabidoo API:", error);
+      }
     }
-}
-
-    // Pokud chceš přesměrování přes Make, použij tento kód:
-    function fetchAndRedirect(command) {
-  const webhookUrl = "https://josefcipera.github.io/voice-commands-pwa/?url={URL}";
-  const payload = { command: command, source: "PWA app" };
-
-  fetch(webhookUrl, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  })
-  .then(response => {
-    if (!response.ok) {
-      throw new Error("Chyba při odesílání na webhook.");
-    }
-    return response.json();
-  })
-  .then(data => {
-    if (data.url) {
-      console.log("🚀 Přesměrování na:", data.url);
-      window.location.href = data.url; // Přesměrování na URL
-    } else {
-      console.error("❌ Žádná URL v odpovědi:", data);
-    }
-  })
-  .catch(error => {
-    console.error("❌ Chyba při odesílání na webhook:", error);
-  });
-}
-
-// Volání funkce po načtení stránky
-fetchAndRedirect();
-
   </script>
 </body>
 </html>
