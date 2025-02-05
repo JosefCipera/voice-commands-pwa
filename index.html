@@ -26,7 +26,7 @@
     };
 
     function sendToWebhook(command) {
-      const webhookUrl = "https://app.tabidoo.cloud/api/v2/webhook/wf-app-itingbuild-dbye-wfid-xipakhc261";
+      const webhookUrl = "https://app.tabidoo.cloud/api/v2/webhook/wf-app-itingbuild-dbye-wfid-xipakhc261"; // tabidoo
       // const webhookUrl = "https://hook.eu1.make.com/7b09prgwkvfvpglmgawszg5golnbgfj8";
       // const webhookUrl = "https://maker.ifttt.com/trigger/speech_command/with/key/c2NysuEUkHUy3dRJmFVx_D";
 
@@ -47,9 +47,34 @@
       .catch(err => console.error("Chyba: ", err));
     }
 
+    async function webhookHandler(request, { log, fetch }) {
+    try {
+        let body = await request.json(); // Načtení dat z webhooku
+        let command = body.command; // Získání povelu z PWA
+        log(`Přijatý hlasový povel: ${command}`);
+
+        // Vyhledání odpovídajícího URL v tabulce "Hlasové povely"
+        let records = await getRecords("Hlasové povely", { filter: { Povel: command } });
+
+        if (records.length > 0) {
+            let urlToSend = records[0].URL;
+            log(`Nalezená URL: ${urlToSend}`);
+
+            // Vrácení odpovědi přímo do PWA
+            return new Response(JSON.stringify({ url: urlToSend }), { status: 200 });
+        } else {
+            log(`Nebyla nalezena odpovídající URL pro povel: ${command}`);
+            return new Response(JSON.stringify({ error: "Neznámý povel" }), { status: 404 });
+        }
+    } catch (error) {
+        log(`Chyba při zpracování: ${error.message}`);
+        return new Response(JSON.stringify({ error: "Chyba na serveru" }), { status: 500 });
+    }
+}
+
     // Pokud chceš přesměrování přes Make, použij tento kód:
     function fetchAndRedirect(command) {
-  const webhookUrl = "https://hook.eu1.make.com/7b09prgwkvfvpglmgawszg5golnbgfj8";
+  const webhookUrl = "https://josefcipera.github.io/voice-commands-pwa/?url={URL}";
   const payload = { command: command, source: "PWA app" };
 
   fetch(webhookUrl, {
