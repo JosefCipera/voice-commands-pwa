@@ -21,21 +21,20 @@
     recognition.onresult = (event) => {
       const command = event.results[0][0].transcript;
       console.log(`Rozpoznaný příkaz: ${command}`);
-      recognition.stop(); // Preventuje nekonečné naslouchání
+      recognition.stop();
       findURLInTabidoo(command);
     };
 
     async function findURLInTabidoo(command) {
-      const apiUrl = "https://app.tabidoo.cloud/api/v2/table/Hlasové%20povely/records";
-      const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZTUxZDI5NS1jZDE4LTQ1NzAtYmUyNi1iMGRmNTJkNTk5MmQiLCJ1bmlxdWVfbmFtZSI6ImNpcGVyYUBpdGluZy5jeiIsInB1cnBvc2UiOiJBUElUb2tlbiIsImFwaVRva2VuSWQiOiI4NGQ5MTM4Ni0xMDA3LTQ5ZjEtYWE1Yi0wMmRmOTU5OTEzYTYiLCJuYmYiOjE3Mzg3ODI3NzcsImV4cCI6NDg5NDQ1NjM3NywiaWF0IjoxNzM4NzgyNzc3fQ.uQ4_7xbAOj5JtT9vHFRRA6YrwOTueEEVFO4Zhonzr6s"; // Nahraď skutečným API tokenem
+      const apiUrl = "https://app.tabidoo.cloud/api/v2/apps/itingbuild-dbye/tables/hlasovepovely/records";
+      const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZTUxZDI5NS1jZDE4LTQ1NzAtYmUyNi1iMGRmNTJkNTk5MmQiLCJ1bmlxdWVfbmFtZSI6ImNpcGVyYUBpdGluZy5jeiIsInB1cnBvc2UiOiJBUElUb2tlbiIsImFwaVRva2VuSWQiOiI4NGQ5MTM4Ni0xMDA3LTQ5ZjEtYWE1Yi0wMmRmOTU5OTEzYTYiLCJuYmYiOjE3Mzg3ODI3NzcsImV4cCI6NDg5NDQ1NjM3NywiaWF0IjoxNzM4NzgyNzc3fQ.uQ4_7xbAOj5JtT9vHFRRA6YrwOTueEEVFO4Zhonzr6s";
 
-      // Vytvoření dotazu na Tabidoo
       const query = {
-        filter: { Povel: command },
+        filter: JSON.stringify({ Povel: command })
       };
 
       try {
-        const response = await fetch(`${apiUrl}?${new URLSearchParams({ filter: JSON.stringify(query.filter) })}`, {
+        const response = await fetch(`${apiUrl}?${new URLSearchParams(query)}`, {
           method: "GET",
           headers: {
             "Authorization": `Bearer ${token}`,
@@ -51,9 +50,9 @@
         console.log("Odpověď z API:", data);
 
         if (data.records.length > 0) {
-          const urlToRedirect = data.records[0].URL;
+          const urlToRedirect = data.records[0].fields.URL; // Opraven přístup ke klíči
           console.log("🚀 Přesměrování na:", urlToRedirect);
-          window.location.href = urlToRedirect; // Přesměrování na odpovídající URL
+          window.location.href = urlToRedirect;
         } else {
           console.warn("❌ Nebyla nalezena odpovídající URL pro povel:", command);
         }
