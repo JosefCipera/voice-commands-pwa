@@ -28,8 +28,12 @@
     function redirectToFixedURL() {
       const urlToRedirect = "https://app.tabidoo.cloud/public-dashboard/xseeqb20db";
       console.log("🚀 Přesměrování na:", urlToRedirect);
-      window.open(urlToRedirect, "_blank");
+  
+      setTimeout(() => {
+        window.location.href = urlToRedirect;
+      }, 100); // Krátké zpoždění
     }
+
   </script>
 </body>
 </html>
