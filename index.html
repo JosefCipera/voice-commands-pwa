@@ -22,9 +22,9 @@
       const command = event.results[0][0].transcript;
       console.log(`Rozpoznaný příkaz: ${command}`);
       recognition.stop();
-      // findURLInTabidoo(command);
+      findURLInTabidoo(command);
     };
-/*
+
     async function findURLInTabidoo(command) {
       const apiUrl = "https://app.tabidoo.cloud/api/v2/apps/itingbuild-dbye/tables/hlasovepovely/records";
       const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZTUxZDI5NS1jZDE4LTQ1NzAtYmUyNi1iMGRmNTJkNTk5MmQiLCJ1bmlxdWVfbmFtZSI6ImNpcGVyYUBpdGluZy5jeiIsInB1cnBvc2UiOiJBUElUb2tlbiIsImFwaVRva2VuSWQiOiJiM2Y4MmQyNi0yMzc0LTQ3M2MtYTE2NC02YTM2YzQ3YzE3ZmQiLCJuYmYiOjE3Mzg4Mzk2ODQsImV4cCI6NDg5NDUxMzI4NCwiaWF0IjoxNzM4ODM5Njg0fQ.Ey4WQ26hknhgmqOXmutUvjgx-PN2amxyypqMk9B6omc";
@@ -61,10 +61,6 @@
         console.error("❌ Chyba při komunikaci s Tabidoo API:", error);
       }
     }
-    // const urlToRedirect = "https://app.tabidoo.cloud/public-dashboard/xx6481xx7f";
-    // console.log("🚀 Přesměrování na:", urlToRedirect);
-    */
-    window.location.href = "https://app.tabidoo.cloud/public-dashboard/xx6481xx7f";
   </script>
 </body>
 </html>
