@@ -22,7 +22,7 @@
       const command = event.results[0][0].transcript;
       console.log(`Rozpoznaný příkaz: ${command}`);
       recognition.stop();
-      findURLInTabidoo(command);
+      // findURLInTabidoo(command);
     };
 
     async function findURLInTabidoo(command) {
@@ -50,7 +50,8 @@
         console.log("Odpověď z API:", data);
 
         if (data.records.length > 0) {
-          const urlToRedirect = data.records[0].fields.URL; // Opraven přístup ke klíči
+          const urlToRedirect = "https://app.tabidoo.cloud/public-dashboard/xx6481xx7f";
+          // const urlToRedirect = data.records[0].fields.URL; 
           console.log("🚀 Přesměrování na:", urlToRedirect);
           window.location.href = urlToRedirect;
         } else {
