@@ -19,19 +19,51 @@
     });
 
     recognition.onresult = (event) => {
-      const command = event.results[0][0].transcript;
-      console.log(`Rozpoznaný příkaz: ${command}`);
+      const command = event.results[0][0].transcript.trim().toLowerCase();
+      console.log(`🎙️ Rozpoznaný příkaz: ${command}`);
       recognition.stop();
-      redirectToFixedURL();
+      findURLInTabidoo(command);
     };
 
-    function redirectToFixedURL() {
-      const urlToRedirect = "https://app.tabidoo.cloud/public-dashboard/xseeqb20db";
-      console.log("🚀 Přesměrování na:", urlToRedirect);
-      
-      let newTab = window.open(urlToRedirect, "_blank");
-      if (!newTab || newTab.closed || typeof newTab.closed === "undefined") {
-        alert("Prohlížeč zablokoval otevření nové stránky. Povolení vyskakovacích oken může pomoci.");
+    async function findURLInTabidoo(command) {
+      const apiUrl = "https://app.tabidoo.cloud/api/v2/apps/itingbuild-dbye/tables/hlasovepovely/records";
+      const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZTUxZDI5NS1jZDE4LTQ1NzAtYmUyNi1iMGRmNTJkNTk5MmQiLCJ1bmlxdWVfbmFtZSI6ImNpcGVyYUBpdGluZy5jeiIsInB1cnBvc2UiOiJBUElUb2tlbiIsImFwaVRva2VuSWQiOiJiM2Y4MmQyNi0yMzc0LTQ3M2MtYTE2NC02YTM2YzQ3YzE3ZmQiLCJuYmYiOjE3Mzg4Mzk2ODQsImV4cCI6NDg5NDUxMzI4NCwiaWF0IjoxNzM4ODM5Njg0fQ.Ey4WQ26hknhgmqOXmutUvjgx-PN2amxyypqMk9B6omc
+"; // Nahraď platným API tokenem
+
+      const query = {
+        filter: JSON.stringify({ Povel: command })
+      };
+
+      try {
+        const response = await fetch(`${apiUrl}?${new URLSearchParams(query)}`, {
+          method: "GET",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`Chyba API: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log("📡 Odpověď z API:", data);
+
+        if (data.records.length > 0) {
+          const urlToRedirect = data.records[0].fields.URL;
+          console.log("🚀 Přesměrování na:", urlToRedirect);
+          setTimeout(() => {
+            window.location.href = urlToRedirect;
+          }, 100); // Krátké zpoždění kvůli prohlížeči
+        } else {
+          console.warn("❌ Nebyla nalezena odpovídající URL pro povel:", command);
+          alert(`❌ Neznámý povel: ${command}`);
+        }
+
+      } catch (error) {
+        console.error("❌ Chyba při komunikaci s Tabidoo API:", error);
+        alert("❌ Nepodařilo se získat data z Tabidoo.");
       }
     }
   </script>
