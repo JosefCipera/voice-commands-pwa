@@ -28,12 +28,12 @@
     function redirectToFixedURL() {
       const urlToRedirect = "https://app.tabidoo.cloud/public-dashboard/xseeqb20db";
       console.log("🚀 Přesměrování na:", urlToRedirect);
-  
-      setTimeout(() => {
-        window.location.href = urlToRedirect;
-      }, 100); // Krátké zpoždění
+      
+      let newTab = window.open(urlToRedirect, "_blank");
+      if (!newTab || newTab.closed || typeof newTab.closed === "undefined") {
+        alert("Prohlížeč zablokoval otevření nové stránky. Povolení vyskakovacích oken může pomoci.");
+      }
     }
-
   </script>
 </body>
 </html>
