@@ -50,8 +50,7 @@
         console.log("Odpověď z API:", data);
 
         if (data.records.length > 0) {
-          const urlToRedirect = "https://app.tabidoo.cloud/public-dashboard/xx6481xx7f";
-          // const urlToRedirect = data.records[0].fields.URL; 
+          const urlToRedirect = data.records[0].fields.URL; 
           console.log("🚀 Přesměrování na:", urlToRedirect);
           window.location.href = urlToRedirect;
         } else {
@@ -62,6 +61,9 @@
         console.error("❌ Chyba při komunikaci s Tabidoo API:", error);
       }
     }
+    const urlToRedirect = "https://app.tabidoo.cloud/public-dashboard/xx6481xx7f";
+    console.log("🚀 Přesměrování na:", urlToRedirect);
+    window.location.href = urlToRedirect;
   </script>
 </body>
 </html>
