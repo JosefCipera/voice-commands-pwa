@@ -39,24 +39,21 @@
             "Content-Type": "application/json",
           },
         });
-
-        if (!response.ok) throw new Error(`Chyba API: ${response.status}`);
-
-        const data = await response.json();
-        console.log("📡 Odpověď z API:", data);
-
-        if (data.records.length > 0) {
-          const urlToRedirect = data.records[0].fields.URL;
-          console.log("🚀 Přesměrování na:", urlToRedirect);
-          const newTab = window.open(urlToRedirect, '_blank');
-          if (!newTab) console.warn("❌ Prohlížeč zablokoval nové okno. Povolit v nastavení.");
-        } else {
-          console.warn("❌ Nebyla nalezena odpovídající URL pro povel:", command);
+      
+        const textResponse = await response.text(); // Převod na text pro lepší analýzu
+        console.log("📡 Surová odpověď z API:", textResponse);
+      
+        // Zkusíme převést na JSON (pokud není HTML)
+        if (textResponse.startsWith("<")) {
+          throw new Error("❌ API vrátilo HTML místo JSON. Možná chyba s tokenem nebo přístupem.");
         }
-
+      
+        const data = JSON.parse(textResponse);
+        console.log("📡 JSON odpověď:", data);
       } catch (error) {
         console.error("❌ Chyba při komunikaci s Tabidoo API:", error);
       }
+
     }
   </script>
 </body>
