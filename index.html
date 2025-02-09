@@ -32,7 +32,7 @@
       const query = { filter: JSON.stringify({ Povel: command }) };
 
       try {
-        const response = await fetch(`${apiUrl}?${new URLSearchParams(query)}`, {
+        const response = await fetch(apiUrl, {
           method: "GET",
           headers: {
             "Authorization": `Bearer ${token}`,
@@ -40,10 +40,15 @@
           },
         });
       
-        const textResponse = await response.text(); // Převod na text pro lepší analýzu
+        console.log("📡 Status kód:", response.status); // Přidá stavovou odpověď
+      
+        const textResponse = await response.text();
         console.log("📡 Surová odpověď z API:", textResponse);
       
-        // Zkusíme převést na JSON (pokud není HTML)
+        if (!response.ok) {
+          throw new Error(`❌ API vrátilo chybu: ${response.status} - ${response.statusText}`);
+        }
+      
         if (textResponse.startsWith("<")) {
           throw new Error("❌ API vrátilo HTML místo JSON. Možná chyba s tokenem nebo přístupem.");
         }
@@ -53,6 +58,7 @@
       } catch (error) {
         console.error("❌ Chyba při komunikaci s Tabidoo API:", error);
       }
+
 
     }
   </script>
