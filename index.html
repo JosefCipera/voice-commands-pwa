@@ -22,49 +22,36 @@
       const command = event.results[0][0].transcript.trim().toLowerCase();
       console.log(`🎙️ Rozpoznaný příkaz: ${command}`);
       recognition.stop();
-      findURLInTabidoo(command);
+      sendCommandToMake(command);
     };
 
-    async function findURLInTabidoo(command) {
-      const apiUrl = "https://app.tabidoo.cloud/api/v2/apps/itingbuild-dbye/tables/hlasovepovely/records";
-      const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZTUxZDI5NS1jZDE4LTQ1NzAtYmUyNi1iMGRmNTJkNTk5MmQiLCJ1bmlxdWVfbmFtZSI6ImNpcGVyYUBpdGluZy5jeiIsInB1cnBvc2UiOiJBUElUb2tlbiIsImFwaVRva2VuSWQiOiJiM2Y4MmQyNi0yMzc0LTQ3M2MtYTE2NC02YTM2YzQ3YzE3ZmQiLCJuYmYiOjE3Mzg4Mzk2ODQsImV4cCI6NDg5NDUxMzI4NCwiaWF0IjoxNzM4ODM5Njg0fQ.Ey4WQ26hknhgmqOXmutUvjgx-PN2amxyypqMk9B6omc";
-      // const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI4OTZhMzAxZi03YjY3LTQwMDQtODBmZi01OTk3YTBlNzQ0OTQiLCJ1bmlxdWVfbmFtZSI6ImFwaVRva2VuSWRfNjk0YzMwZGYtZDZlNS00MjE3LThhNjUtNDJjOGVlYTczNmJjIiwicHVycG9zZSI6IkFQSVRva2VuIiwiYXBpVG9rZW5JZCI6IjY5NGMzMGRmLWQ2ZTUtNDIxNy04YTY1LTQyYzhlZWE3MzZiYyIsIm5iZiI6MTczOTA4OTQxMSwiZXhwIjo0ODk0NzYzMDExLCJpYXQiOjE3MzkwODk0MTF9.win3vzCJQfKo2acJyuRUcW8Pf0Gxts9JmbV7f_v6HOY";
-
-      // const query = { filter: JSON.stringify({ Povel: command }) };
-      const queryString = `?filter=${encodeURIComponent(JSON.stringify({ Povel: command }))}`;
-
-
+    async function sendCommandToMake(command) {
+      const webhookUrl = "https://hook.eu1.make.com/7b09prgwkvfvpglmgawszg5golnbgfj8";
+      
       try {
-        const response = await fetch(apiUrl + queryString, {
-          method: "GET",
+        const response = await fetch(webhookUrl, {
+          method: "POST",
           headers: {
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json",
+            "Content-Type": "application/json"
           },
+          body: JSON.stringify({ command })
         });
-        console.log("📡 URL dotazu:", apiUrl + queryString);
-        console.log("📡 Odesílám token:", token);
-
-        console.log("📡 Status kód:", response.status); // Přidá stavovou odpověď
-      
-        const textResponse = await response.text();
-        console.log("📡 Surová odpověď z API:", textResponse);
-      
+        
         if (!response.ok) {
-          throw new Error(`❌ API vrátilo chybu: ${response.status} - ${response.statusText}`);
+          throw new Error(`❌ Chyba: ${response.status} - ${response.statusText}`);
         }
-      
-        if (textResponse.startsWith("<")) {
-          throw new Error("❌ API vrátilo HTML místo JSON. Možná chyba s tokenem nebo přístupem.");
+        
+        const data = await response.json();
+        console.log("📡 Odpověď z Make:", data);
+        
+        if (data.url) {
+          window.location.href = data.url;
+        } else {
+          console.error("❌ Nebyla vrácena žádná URL.");
         }
-      
-        const data = JSON.parse(textResponse);
-        console.log("📡 JSON odpověď:", data);
       } catch (error) {
-        console.error("❌ Chyba při komunikaci s Tabidoo API:", error);
+        console.error("❌ Chyba při komunikaci s Make:", error);
       }
-
-
     }
   </script>
 </body>
