@@ -30,17 +30,21 @@
       const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZTUxZDI5NS1jZDE4LTQ1NzAtYmUyNi1iMGRmNTJkNTk5MmQiLCJ1bmlxdWVfbmFtZSI6ImNpcGVyYUBpdGluZy5jeiIsInB1cnBvc2UiOiJBUElUb2tlbiIsImFwaVRva2VuSWQiOiJiM2Y4MmQyNi0yMzc0LTQ3M2MtYTE2NC02YTM2YzQ3YzE3ZmQiLCJuYmYiOjE3Mzg4Mzk2ODQsImV4cCI6NDg5NDUxMzI4NCwiaWF0IjoxNzM4ODM5Njg0fQ.Ey4WQ26hknhgmqOXmutUvjgx-PN2amxyypqMk9B6omc";
       // const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI4OTZhMzAxZi03YjY3LTQwMDQtODBmZi01OTk3YTBlNzQ0OTQiLCJ1bmlxdWVfbmFtZSI6ImFwaVRva2VuSWRfNjk0YzMwZGYtZDZlNS00MjE3LThhNjUtNDJjOGVlYTczNmJjIiwicHVycG9zZSI6IkFQSVRva2VuIiwiYXBpVG9rZW5JZCI6IjY5NGMzMGRmLWQ2ZTUtNDIxNy04YTY1LTQyYzhlZWE3MzZiYyIsIm5iZiI6MTczOTA4OTQxMSwiZXhwIjo0ODk0NzYzMDExLCJpYXQiOjE3MzkwODk0MTF9.win3vzCJQfKo2acJyuRUcW8Pf0Gxts9JmbV7f_v6HOY";
 
-      const query = { filter: JSON.stringify({ Povel: command }) };
+      // const query = { filter: JSON.stringify({ Povel: command }) };
+      const queryString = `?filter=${encodeURIComponent(JSON.stringify({ Povel: command }))}`;
+
 
       try {
-        const response = await fetch(apiUrl, {
+        const response = await fetch(apiUrl + queryString, {
           method: "GET",
           headers: {
             "Authorization": `Bearer ${token}`,
             "Content-Type": "application/json",
           },
         });
-      
+        console.log("📡 URL dotazu:", apiUrl + queryString);
+        console.log("📡 Odesílám token:", token);
+
         console.log("📡 Status kód:", response.status); // Přidá stavovou odpověď
       
         const textResponse = await response.text();
