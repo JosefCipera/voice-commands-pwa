@@ -27,32 +27,35 @@
 
     async function sendCommandToMake(command) {
       const webhookUrl = "https://hook.eu1.make.com/ns3n8fk70iwoex1kme9af5j6ghh3351x"; // Uprav dle aktuálního webhooku
-    
+
       try {
         const response = await fetch(webhookUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ command }),
+          body: JSON.stringify({ Povel: command }), // ✅ Oprava klíče v JSONu
         });
-    
+
         console.log("📡 HTTP status:", response.status);
-    
-        const result = await response.json();
-        console.log("📡 Odpověď z Make:", result);
-    
-        if (result.url) {
-          console.log("➡️ Přesměrování na:", result.url);
-          window.location.href = result.url; // Přesměrování na získanou URL
-        } else {
-          console.error("❌ Chyba: URL nebyla v odpovědi nalezena.");
+
+        const text = await response.text();
+        try {
+          const result = JSON.parse(text);
+          console.log("📡 Odpověď z Make:", result);
+
+          if (result.url) {
+            console.log("➡️ Přesměrování na:", result.url);
+            window.location.href = result.url;
+          } else {
+            console.error("❌ Chyba: URL nebyla v odpovědi nalezena.");
+          }
+        } catch (error) {
+          console.error("❌ Chyba při parsování JSON odpovědi:", text);
         }
-    
+
       } catch (error) {
         console.error("❌ Chyba při komunikaci s Make:", error);
       }
     }
-
-
   </script>
 </body>
 </html>
