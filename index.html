@@ -26,33 +26,27 @@
     };
 
     async function sendCommandToMake(command) {
-      // const webhookUrl = "https://hook.eu1.make.com/7b09prgwkvfvpglmgawszg5golnbgfj8";
-      const webhookUrl = "https://hook.eu1.make.com/ujncwsh2dkblbexiyf4mlq9ox81saf7o";
-      try {
-        const response = await fetch(webhookUrl, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ command })
-        });
-        
-        if (!response.ok) {
-          throw new Error(`❌ Chyba: ${response.status} - ${response.statusText}`);
+        const makeWebhookUrl = "https://hook.eu1.make.com/ujncwsh2dkblbexiyf4mlq9ox81saf7o";
+    
+        try {
+            const response = await fetch(makeWebhookUrl, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ command: command })
+            });
+    
+            console.log("📡 Odeslaný požadavek:", JSON.stringify({ command: command }));
+            console.log("📡 HTTP status:", response.status);
+            
+            const textResponse = await response.text();
+            console.log("📡 Surová odpověď:", textResponse);
+        } catch (error) {
+            console.error("❌ Chyba při odesílání na Make:", error);
         }
-        
-        const data = await response.json();
-        console.log("📡 Odpověď z Make:", data);
-        
-        if (data.url) {
-          window.location.href = data.url;
-        } else {
-          console.error("❌ Nebyla vrácena žádná URL.");
-        }
-      } catch (error) {
-        console.error("❌ Chyba při komunikaci s Make:", error);
-      }
     }
+
   </script>
 </body>
 </html>
