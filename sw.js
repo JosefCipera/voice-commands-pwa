@@ -5,8 +5,8 @@ const URLS_TO_CACHE = [
   '/voice-commands-pwa/index.html',    // HTML aplikace
   '/voice-commands-pwa/app.js',        // JavaScript aplikace
   '/voice-commands-pwa/manifest.json', // Manifest soubor
-  '/voice-commands-pwa/icon-192x192.png', // Ikona 192x192
-  '/voice-commands-pwa/icon-512x512.png'  // Ikona 512x512
+  '/voice-commands-pwa/microphone-192.webp', // Ikona 192x192
+  '/voice-commands-pwa/microphone-512.webp'  // Ikona 512x512
 ];
 
 // Instalace Service Workeru
