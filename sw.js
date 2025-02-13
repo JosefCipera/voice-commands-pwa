@@ -1,12 +1,12 @@
 // Service Worker pro PWA
-const CACHE_NAME = 'voice-commands-cache-v1';
+const CACHE_NAME = 'voice-commands-cache-v2';
 const URLS_TO_CACHE = [
-  '/voice-commands-pwa/',              // Kořenová stránka
-  '/voice-commands-pwa/index.html',    // HTML aplikace
-  '/voice-commands-pwa/app.js',        // JavaScript aplikace
-  '/voice-commands-pwa/manifest.json', // Manifest soubor
-  '/voice-commands-pwa/microphone-192.webp', // Ikona 192x192
-  '/voice-commands-pwa/microphone-512.webp'  // Ikona 512x512
+  '/voice-commands-pwa/',              
+  '/voice-commands-pwa/index.html',    
+  '/voice-commands-pwa/app.js',        
+  '/voice-commands-pwa/manifest.json', 
+  '/voice-commands-pwa/microphone-192.webp', 
+  '/voice-commands-pwa/microphone-512.webp'
 ];
 
 // Instalace Service Workeru
@@ -35,12 +35,17 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Zpracování požadavků (fetch)
+// Zpracování požadavků (fetch) + offline fallback
 self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request).then((response) => {
-      // Pokud existuje odpověď v cache, použij ji, jinak načti z internetu
-      return response || fetch(event.request);
+      if (response) {
+        return response; // Pokud soubor existuje v cache, použij ho.
+      }
+      return fetch(event.request).catch(() => {
+        // Pokud jsme offline a soubor není v cache, vrať hlavní stránku
+        return caches.match('/voice-commands-pwa/index.html');
+      });
     })
   );
 });
