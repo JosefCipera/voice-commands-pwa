@@ -7,12 +7,12 @@
   "theme_color": "#4CAF50",
   "icons": [
     {
-      "src": "microphone-192.webp",
+      "src": "/voice-commands-pwa/microphone-192.webp",
       "sizes": "192x192",
       "type": "image/webp"
     },
     {
-      "src": "microphone-512.webp",
+      "src": "/voice-commands-pwa/microphone-512.webp",
       "sizes": "512x512",
       "type": "image/webp"
     }
