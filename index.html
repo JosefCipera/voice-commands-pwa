@@ -7,17 +7,9 @@
   <link rel="manifest" href="/voice-commands-pwa/manifest.json">
   <link rel="icon" type="image/png" href="/voice-commands-pwa/microphone-192.png">
   <link rel="icon" type="image/png" href="/voice-commands-pwa/microphone-512.png">
-  <link rel="stylesheet" href="style.css"> <!-- Přidáme styl -->
 </head>
 <body>
-  <div class="container">
-    <div class="top-half">
-      <img src="/voice-commands-pwa/microphone-512.png" alt="Microphone" id="start-speech" class="mic-icon">
-    </div>
-    <div class="bottom-half">
-      <!-- Placeholder pro budoucí obsah -->
-    </div>
-  </div>
+  <button id="start-speech">🎤 Start</button>
 
   <script>
     const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
