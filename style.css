@@ -15,8 +15,16 @@ body {
     flex-direction: column;
 }
 
+.top-half, .bottom-half {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .mic-icon {
-    width: 350px; /* Pevná šířka pro desktop */
+    width: 50vw; /* Polovina šířky viewportu na mobilu a desktopu */
+    max-width: 350px; /* Omezení na desktopu, aby nezaplnil celou šířku */
     height: auto; /* Zachování poměru */
     cursor: pointer;
     transition: opacity 0.3s; /* Změníme na opacity pro lepší efekt */
@@ -26,11 +34,10 @@ body {
     opacity: 0.7; /* Změníme průhlednost během nahrávání */
 }
 
-/* Mobilní verze */
+/* Mobilní verze – zůstává stejné, protože 50vw už je responzivní */
 @media (max-width: 768px) {
     .mic-icon {
-        width: 80vw !important; /* 80% šířky viewportu */
-        max-width: 100%;
-        height: auto;
+        width: 50vw; /* Zachováváme polovinu šířky mobilu */
+        max-width: none; /* Žádné omezení na mobilu */
     }
 }
