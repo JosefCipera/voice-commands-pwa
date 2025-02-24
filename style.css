@@ -23,8 +23,7 @@ body {
 }
 
 .mic-icon {
-    width: 50vw; /* Polovina šířky viewportu na mobilu i desktopu */
-    max-width: 350px; /* Omezení na desktopu, aby nezaplnil celou šířku */
+    width: 350px; /* Pevná šířka pro desktop */
     height: auto; /* Zachování poměru */
     cursor: pointer;
     transition: opacity 0.3s; /* Změníme na opacity pro lepší efekt */
@@ -34,10 +33,10 @@ body {
     opacity: 0.7; /* Změníme průhlednost během nahrávání */
 }
 
-/* Mobilní verze – zůstává stejné, protože 50vw už je responzivní */
+/* Mobilní verze – přizpůsobíme na 50% šířky */
 @media (max-width: 768px) {
     .mic-icon {
-        width: 50vw; /* Zachováváme polovinu šířky mobilu */
+        width: 50vw; /* Polovina šířky mobilu */
         max-width: none; /* Žádné omezení na mobilu */
     }
 }
