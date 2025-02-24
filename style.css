@@ -1,0 +1,36 @@
+body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f0f0f0;
+    font-family: Arial, sans-serif;
+}
+
+.container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.mic-icon {
+    width: 350px; /* Pevná šířka pro desktop */
+    height: auto; /* Zachování poměru */
+    cursor: pointer;
+    transition: opacity 0.3s; /* Změníme na opacity pro lepší efekt */
+}
+
+.mic-icon.recording {
+    opacity: 0.7; /* Změníme průhlednost během nahrávání */
+}
+
+/* Mobilní verze */
+@media (max-width: 768px) {
+    .mic-icon {
+        width: 80vw !important; /* 80% šířky viewportu */
+        max-width: 100%;
+        height: auto;
+    }
+}
