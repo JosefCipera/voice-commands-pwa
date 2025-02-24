@@ -23,7 +23,7 @@ body {
 }
 
 .mic-icon {
-    width: 50vw; /* Polovina šířky viewportu na mobilu a desktopu */
+    width: 50vw; /* Polovina šířky viewportu na mobilu i desktopu */
     max-width: 350px; /* Omezení na desktopu, aby nezaplnil celou šířku */
     height: auto; /* Zachování poměru */
     cursor: pointer;
