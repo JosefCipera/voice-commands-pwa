@@ -58,11 +58,11 @@ if (!('SpeechRecognition' in window) && !('webkitSpeechRecognition' in window)) 
             outputDiv.innerText = `Rozpoznáno: ${transcript}`;
             console.log(`🎤 Rozpoznaný text: ${transcript}`);
 
-            // ✅ Počkej 5 sekund a přejdi na veřejnou stránku
-            // setTimeout(() => {
-            //    iframe.src = "https://app.tabidoo.cloud/public-dashboard/xx6481xx7f";
-            //    console.log('🔄 Načítání veřejné stránky...');
-           // }, 5000);
+            ✅ Počkej 5 sekund a přejdi na veřejnou stránku
+            setTimeout(() => {
+                iframe.src = "https://app.tabidoo.cloud/public-dashboard/xx6481xx7f";
+                console.log('🔄 Načítání veřejné stránky...');
+            }, 5000);
         };
 
         recognition.onerror = (event) => {
