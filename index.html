@@ -4,13 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Hlasové příkazy</title>
-  <link rel="stylesheet" href="style.css">
   <link rel="manifest" href="/voice-commands-pwa/manifest.json">
-  <link rel="icon" type="image/png" href="/voice-commands-pwa/microphone-192.png">
-  <link rel="icon" type="image/png" href="/voice-commands-pwa/microphone-512.png">
+  <!-- Odstraněno nepotřebné <link rel="icon"...>, protože favicon je již definován v manifest.json -->
 </head>
 <body>
-  <img src="/voice-commands-pwa/microphone.png" alt="Microphone" id="start-speech" class="mic-icon">
+  <div class="container">
+    <div class="top-half">
+      <img src="/voice-commands-pwa/microphone.png" alt="Microphone" id="start-speech" class="mic-icon">
+    </div>
+    <div class="bottom-half">
+      <!-- Placeholder pro budoucí obsah, pokud budeš chtít něco přidat dole -->
+    </div>
+  </div>
 
   <script>
     const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
