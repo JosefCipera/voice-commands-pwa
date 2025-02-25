@@ -56,17 +56,15 @@
     };
 
     async function handleCommand(command) {
-      // Předzpracování příkazu – extrahujeme klíčová slova s větší flexibilitou
+      // Předzpracování příkazu – hledáme klíčové slovo "vytížení" (nebo jiné definované slovo)
       const keywords = command.split(' ').filter(word => 
-        word !== 'zobraz' && 
-        word !== 'ukaž' && 
-        word !== 'spusť' && 
-        word !== 'přehraj' && 
-        word !== 'na' && 
-        word !== 'pro'
+        word === 'vytížení' || // Hlavní klíčové slovo
+        word === 'kapacita' || // Další možná klíčová slova
+        word === 'kapacit' // Variace
       );
-      const keyCommand = keywords.join(' ').toLowerCase(); // Vždy malá písmena
+      const keyCommand = keywords.length > 0 ? keywords[0] : command; // Pokud nenajdeme klíčové slovo, použijeme celý příkaz
       console.log(`Klíčové slovo odeslané do Make.com: ${keyCommand}`);
+      console.log(`Celý příkaz: ${command}`);
 
       const webhookUrl = "https://hook.eu1.make.com/ns3n8fk70iwoex1kme9af5j6ghh3351x";
 
@@ -74,7 +72,7 @@
         const response = await fetch(webhookUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ Povel: keyCommand }), // Odeslání zpracovaného příkazu
+          body: JSON.stringify({ Povel: keyCommand }), // Odeslání klíčového slova
         });
 
         console.log("📡 HTTP status:", response.status);
