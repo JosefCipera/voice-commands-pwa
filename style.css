@@ -33,33 +33,10 @@ body {
     opacity: 0.7; /* Změníme průhlednost během nahrávání */
 }
 
-#output {
-    font-size: 18px;
-    color: #333;
-    text-align: center;
-    margin-top: 20px;
-}
-
-#media-container {
-    width: 90%;
-    margin-top: 20px;
-}
-
-#media-container audio, #media-container video, #media-container iframe {
-    display: block;
-    margin: 10px auto;
-}
-
-/* Mobilní verze */
+/* Mobilní verze – přizpůsobíme na 50% šířky */
 @media (max-width: 768px) {
     .mic-icon {
         width: 50vw; /* Polovina šířky mobilu */
         max-width: none; /* Žádné omezení na mobilu */
-    }
-    #output {
-        font-size: 16px; /* Menší text na mobilu */
-    }
-    #media-container {
-        width: 95%;
     }
 }
