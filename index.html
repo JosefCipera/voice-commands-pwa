@@ -41,6 +41,31 @@
       document.getElementById('start-speech').classList.remove('recording');
     };
 
+    document.addEventListener('DOMContentLoaded', async () => {
+      let commandMap = JSON.parse(localStorage.getItem('commands')) || {};
+      if (Object.keys(commandMap).length === 0) {
+        try {
+          const response = await fetch('https://api.tabidoo.cloud/v1/tables/{tableId}/records?limit=30', {
+            headers: {
+              'Authorization': 'Bearer {tvoji_api_klíč}',
+              'Content-Type': 'application/json'
+            }
+          });
+          const commands = await response.json();
+          commands.forEach(record => {
+            commandMap[record.Příkaz.toLowerCase()] = record.URL;
+          });
+          localStorage.setItem('commands', JSON.stringify(commandMap));
+          window.commands = commandMap;
+        } catch (error) {
+          console.error('❌ Chyba při načítání příkazů z Tabidoo:', error);
+          document.getElementById('output').innerText = 'Chyba při načítání příkazů – zkontrolujte připojení.';
+        }
+      } else {
+        window.commands = commandMap;
+      }
+    });
+
     document.getElementById('start-speech').addEventListener('click', () => {
       recognition.start();
       console.log('🎤 Hlasové rozpoznávání spuštěno...');
@@ -72,51 +97,24 @@
         return;
       }
 
-      // Předzpracování příkazu – hledáme klíčová slova
-      const keywords = command.split(' ').filter(word => 
-        word === 'vytížení' || 
-        word === 'kapacita' || 
-        word === 'kapacit' || 
-        word === 'graf' || 
-        word === 'video' || 
-        word === 'audio' || 
-        word === 'dashboard'
-      );
-      const keyCommand = keywords.length > 0 ? keywords.join(' ') : command;
-      console.log(`Klíčové slovo odeslané do Make.com: ${keyCommand}`);
-      console.log(`Celý příkaz: ${command}`);
+      const lowerCommand = command.toLowerCase();
+      console.log(`Rozpoznaný příkaz: ${lowerCommand}`);
 
-      const webhookUrl = "https://hook.eu1.make.com/ns3n8fk70iwoex1kme9af5j6ghh3351x";
-
-      try {
-        const response = await fetch(webhookUrl, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ Povel: keyCommand }),
-        });
-
-        console.log("📡 HTTP status:", response.status);
-
-        const text = await response.text();
-        try {
-          const result = JSON.parse(text);
-          console.log("📡 Odpověď z Tabidoo přes Make:", result);
-
-          if (result.url) {
-            console.log("➡️ Zpracovávám URL:", result.url);
-            displayContent(result.url);
-          } else {
-            console.error("❌ Chyba: URL nebyla v odpovědi nalezena.");
-            document.getElementById('output').innerText = 'Chyba: URL nebyla nalezena.';
-          }
-        } catch (error) {
-          console.error("❌ Chyba při parsování JSON odpovědi:", text);
-          document.getElementById('output').innerText = 'Chyba při zpracování odpovědi.';
+      // Hledání shody v načtených příkazech z Tabidoo
+      let foundUrl = null;
+      for (const [cmd, url] of Object.entries(window.commands || {})) {
+        if (lowerCommand.includes(cmd)) { // Použijeme includes místo contains pro přesnější shodu
+          foundUrl = url;
+          break;
         }
+      }
 
-      } catch (error) {
-        console.error("❌ Chyba při komunikaci s Tabidoo přes Make:", error);
-        document.getElementById('output').innerText = 'Chyba při komunikaci s Tabidoo.';
+      if (foundUrl) {
+        console.log(`➡️ Nalezeno URL: ${foundUrl}`);
+        displayContent(foundUrl);
+      } else {
+        console.error("❌ Žádná shoda pro příkaz nebyla nalezena.");
+        document.getElementById('output').innerText = 'Žádný příkaz nebyl nalezen – řekněte jiný příkaz, např. "Zobraz vytížení".';
       }
     }
 
