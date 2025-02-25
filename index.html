@@ -13,7 +13,7 @@
       <img src="/voice-commands-pwa/microphone-512.png" alt="Microphone" id="start-speech" class="mic-icon">
     </div>
     <div class="bottom-half">
-      <div id="output"></div>
+      <div id="output">Řekněte příkaz, např. 'Zobraz vytížení', 'Přehrát video školení', nebo 'Spusť audio návod'.</div>
     </div>
   </div>
 
@@ -45,6 +45,15 @@
       recognition.start();
       console.log('🎤 Hlasové rozpoznávání spuštěno...');
       document.getElementById('start-speech').classList.add('recording');
+
+      // Automatické zastavení po 10 sekundách
+      setTimeout(() => {
+        if (recognition) {
+          recognition.stop();
+          console.log('🔇 Hlasové rozpoznávání automaticky ukončeno po 10 sekundách.');
+          document.getElementById('start-speech').classList.remove('recording');
+        }
+      }, 10000);
     });
 
     recognition.onresult = (event) => {
@@ -56,13 +65,24 @@
     };
 
     async function handleCommand(command) {
-      // Předzpracování příkazu – hledáme klíčové slovo "vytížení" (nebo jiné definované slovo)
+      const words = command.split(' ').length;
+      if (words > 10) {
+        console.warn('⚠️ Příkaz je příliš dlouhý – omezte na 10 slov.');
+        document.getElementById('output').innerText = 'Příkaz je příliš dlouhý – řekněte kratší příkaz (max. 10 slov).';
+        return;
+      }
+
+      // Předzpracování příkazu – hledáme klíčová slova
       const keywords = command.split(' ').filter(word => 
-        word === 'vytížení' || // Hlavní klíčové slovo
-        word === 'kapacita' || // Další možná klíčová slova
-        word === 'kapacit' // Variace
+        word === 'vytížení' || 
+        word === 'kapacita' || 
+        word === 'kapacit' || 
+        word === 'graf' || 
+        word === 'video' || 
+        word === 'audio' || 
+        word === 'dashboard'
       );
-      const keyCommand = keywords.length > 0 ? keywords[0] : command; // Pokud nenajdeme klíčové slovo, použijeme celý příkaz
+      const keyCommand = keywords.length > 0 ? keywords.join(' ') : command;
       console.log(`Klíčové slovo odeslané do Make.com: ${keyCommand}`);
       console.log(`Celý příkaz: ${command}`);
 
@@ -72,7 +92,7 @@
         const response = await fetch(webhookUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ Povel: keyCommand }), // Odeslání klíčového slova
+          body: JSON.stringify({ Povel: keyCommand }),
         });
 
         console.log("📡 HTTP status:", response.status);
@@ -118,8 +138,15 @@
         video.src = url;
         output.innerHTML = '';
         output.appendChild(video);
+      } else if (url.includes('.pdf')) {
+        const iframe = document.createElement('iframe');
+        iframe.width = '100%';
+        iframe.height = '500px';
+        iframe.src = url;
+        output.innerHTML = '';
+        output.appendChild(iframe);
       } else {
-        window.location.href = url; // Pro stránky a dashboardy
+        window.location.href = url; // Pro stránky, dashboardy, grafy
       }
     }
   </script>
