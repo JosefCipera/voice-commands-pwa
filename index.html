@@ -45,12 +45,19 @@
       let commandMap = JSON.parse(localStorage.getItem('commands')) || {};
       if (Object.keys(commandMap).length === 0) {
         try {
-          const response = await fetch('https://app.tabidoo.cloud/api/v2/tables/hlasovepovely/records?limit=30', {
+          // Test domény před voláním API
+          const domainTest = await fetch('https://app.tabidoo.cloud', { mode: 'no-cors' });
+          console.log('Test domény API Tabidoo: ', domainTest.status);
+
+          const response = await fetch('https://app.tabidoo.cloud/api/v2/tables/hlasovePovely/records?limit=30', {
             headers: {
-              'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZTUxZDI5NS1jZDE4LTQ1NzAtYmUyNi1iMGRmNTJkNTk5MmQiLCJ1bmlxdWVfbmFtZSI6ImNpcGVyYUBpdGluZy5jeiIsInB1cnBvc2UiOiJBUElUb2tlbiIsImFwaVRva2VuSWQiOiI1OWM5ODQ4NC0zNWFhLTQzYWYtYTI1Yi0yY2IwNTc1OTc0NGQiLCJuYmYiOjE3MzEwODIwMzUsImV4cCI6NDg4Njc1NTYzNSwiaWF0IjoxNzMxMDgyMDM1fQ.sEpNzjHwCNzS69_EsSEmqrc6lMWQba4tBTbPNa8y4JY',
-              'Content-Type': 'application/json'
+              'Authorization': 'Bearer ' + encodeURIComponent('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZTUxZDI5NS1jZDE4LTQ1NzAtYmUyNi1iMGRmNTJkNTk5MmQiLCJ1bmlxdWVfbmFtZSI6ImNpcGVyYUBpdGluZy5jeiIsInB1cnBvc2UiOiJBUElUb2tlbiIsImFwaVRva2VuSWQiOiI1OWM5ODQ4NC0zNWFhLTQzYWYtYTI1Yi0yY2IwNTc1OTc0NGQiLCJuYmYiOjE3MzEwODIwMzUsImV4cCI6NDg4Njc1NTYzNSwiaWF0IjoxNzMxMDgyMDM1fQ.sEpNzjHwCNzS69_EsSEmqrc6lMWQba4tBTbPNa8y4JY'),
+              'Content-Type': 'application/json;charset=UTF-8'
             }
           });
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status} – ${response.statusText}`);
+          }
           const commands = await response.json();
           commands.forEach(record => {
             commandMap[record.Příkaz.toLowerCase()] = record.URL;
@@ -58,8 +65,16 @@
           localStorage.setItem('commands', JSON.stringify(commandMap));
           window.commands = commandMap;
         } catch (error) {
-          console.error('❌ Chyba při načítání příkazů z Tabidoo:', error);
-          document.getElementById('output').innerText = 'Chyba při načítání příkazů – zkontrolujte připojení.';
+          console.error('❌ Chyba při načítání příkazů z Tabidoo:', error.message);
+          document.getElementById('output').innerText = 'Chyba při načítání příkazů – zkontrolujte API, připojení, nebo kontaktujte podporu Tabidoo.';
+          // Fallback – použij výchozí příkazy, pokud API selže
+          window.commands = {
+            'vytížení': 'https://app.tabidoo.cloud/public-dashboard/xx6481xx7f',
+            'kapacit': 'https://example.com/kapacit',
+            'graf': 'https://example.com/graf',
+            'video': 'https://youtube.com/video-id',
+            'audio': 'https://example.com/audio.mp3'
+          };
         }
       } else {
         window.commands = commandMap;
