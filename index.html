@@ -3,11 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hlasové příkazy</title>
+  <title>Chytré já</title>
   <link rel="manifest" href="/voice-commands-pwa/manifest.json">
-  <link rel="icon" type="image/png" href="/voice-commands-pwa/microphone-192.png">
-  <link rel="icon" type="image/png" href="/voice-commands-pwa/microphone-512.png">
-  <link rel="stylesheet" href="style.css"> <!-- Přidáme styl -->
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="container">
@@ -15,35 +13,68 @@
       <img src="/voice-commands-pwa/microphone-512.png" alt="Microphone" id="start-speech" class="mic-icon">
     </div>
     <div class="bottom-half">
-      <!-- Placeholder pro budoucí obsah -->
+      <div id="output"></div>
     </div>
   </div>
 
   <script>
+    if (!('SpeechRecognition' in window) && !('webkitSpeechRecognition' in window)) {
+      console.error('❌ Hlasové rozpoznávání není podporováno.');
+      alert('Hlasové rozpoznávání není podporováno. Zkuste to v Chrome nebo na jiném zařízení.');
+      document.getElementById('start-speech').disabled = true;
+      throw new Error('SpeechRecognition not supported');
+    }
+
     const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
     recognition.lang = 'cs-CZ';
     recognition.interimResults = false;
+    recognition.continuous = false;
+
+    recognition.onerror = (event) => {
+      console.error('❌ Chyba při hlasovém rozpoznávání:', event.error);
+      alert(`Chyba při rozpoznávání hlasu: ${event.error}. Zkontrolujte povolení mikrofonu.`);
+      document.getElementById('start-speech').classList.remove('recording');
+    };
+
+    recognition.onend = () => {
+      console.log('🔇 Hlasové rozpoznávání ukončeno.');
+      document.getElementById('start-speech').classList.remove('recording');
+    };
 
     document.getElementById('start-speech').addEventListener('click', () => {
       recognition.start();
       console.log('🎤 Hlasové rozpoznávání spuštěno...');
+      document.getElementById('start-speech').classList.add('recording');
     });
 
     recognition.onresult = (event) => {
       const command = event.results[0][0].transcript.trim().toLowerCase();
       console.log(`🎙️ Rozpoznaný příkaz: ${command}`);
+      document.getElementById('output').innerText = `Rozpoznáno: ${command}`;
       recognition.stop();
-      sendCommandToMake(command);
+      handleCommand(command);
     };
 
-    async function sendCommandToMake(command) {
-      const webhookUrl = "https://hook.eu1.make.com/ns3n8fk70iwoex1kme9af5j6ghh3351x"; // Uprav dle aktuálního webhooku
+    async function handleCommand(command) {
+      // Předzpracování příkazu – extrahujeme klíčová slova s větší flexibilitou
+      const keywords = command.split(' ').filter(word => 
+        word !== 'zobraz' && 
+        word !== 'ukaž' && 
+        word !== 'spusť' && 
+        word !== 'přehraj' && 
+        word !== 'na' && 
+        word !== 'pro'
+      );
+      const keyCommand = keywords.join(' ').toLowerCase(); // Vždy malá písmena
+      console.log(`Klíčové slovo odeslané do Make.com: ${keyCommand}`);
+
+      const webhookUrl = "https://hook.eu1.make.com/ns3n8fk70iwoex1kme9af5j6ghh3351x";
 
       try {
         const response = await fetch(webhookUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ Povel: command }), // ✅ Oprava klíče v JSONu
+          body: JSON.stringify({ Povel: keyCommand }), // Odeslání zpracovaného příkazu
         });
 
         console.log("📡 HTTP status:", response.status);
@@ -51,20 +82,46 @@
         const text = await response.text();
         try {
           const result = JSON.parse(text);
-          console.log("📡 Odpověď z Make:", result);
+          console.log("📡 Odpověď z Tabidoo přes Make:", result);
 
           if (result.url) {
-            console.log("➡️ Přesměrování na:", result.url);
-            window.location.href = result.url;
+            console.log("➡️ Zpracovávám URL:", result.url);
+            displayContent(result.url);
           } else {
             console.error("❌ Chyba: URL nebyla v odpovědi nalezena.");
+            document.getElementById('output').innerText = 'Chyba: URL nebyla nalezena.';
           }
         } catch (error) {
           console.error("❌ Chyba při parsování JSON odpovědi:", text);
+          document.getElementById('output').innerText = 'Chyba při zpracování odpovědi.';
         }
 
       } catch (error) {
-        console.error("❌ Chyba při komunikaci s Make:", error);
+        console.error("❌ Chyba při komunikaci s Tabidoo přes Make:", error);
+        document.getElementById('output').innerText = 'Chyba při komunikaci s Tabidoo.';
+      }
+    }
+
+    function displayContent(url) {
+      const output = document.getElementById('output');
+      output.innerText = `Načítám obsah: ${url}`;
+
+      // Rozpoznání typu URL
+      if (url.includes('.mp3') || url.includes('.wav')) {
+        const audio = document.createElement('audio');
+        audio.controls = true;
+        audio.src = url;
+        output.innerHTML = '';
+        output.appendChild(audio);
+      } else if (url.includes('youtube.com') || url.includes('vimeo.com') || url.includes('.mp4')) {
+        const video = document.createElement('video');
+        video.controls = true;
+        video.width = '100%';
+        video.src = url;
+        output.innerHTML = '';
+        output.appendChild(video);
+      } else {
+        window.location.href = url; // Pro stránky a dashboardy
       }
     }
   </script>
