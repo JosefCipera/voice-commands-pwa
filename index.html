@@ -41,46 +41,6 @@
       document.getElementById('start-speech').classList.remove('recording');
     };
 
-    document.addEventListener('DOMContentLoaded', async () => {
-      let commandMap = JSON.parse(localStorage.getItem('commands')) || {};
-      if (Object.keys(commandMap).length === 0) {
-        try {
-          // Test domény před voláním API
-          const domainTest = await fetch('https://app.tabidoo.cloud', { mode: 'no-cors' });
-          console.log('Test domény API Tabidoo: ', domainTest.status);
-
-          const response = await fetch('https://app.tabidoo.cloud/api/v2/tables/hlasovePovely/records?limit=30', {
-            headers: {
-              'Authorization': 'Bearer ' + encodeURIComponent('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjYmU1OWUxOC1mM2Q1LTQwNjEtODA4Yi1kODdiNTEwN2YwOGEiLCJ1bmlxdWVfbmFtZSI6ImFwaVRva2VuSWRfNWE1MDNlNzctNTg4Zi00NGViLWI1YjItNTE1OTg2N2JlOGMzIiwicHVycG9zZSI6IkFQSVRva2VuIiwiYXBpVG9rZW5JZCI6IjVhNTAzZTc3LTU4OGYtNDRlYi1iNWIyLTUxNTk4NjdiZThjMyIsIm5iZiI6MTc0MDUwODk0NiwiZXhwIjo0ODk2MTgyNTQ2LCJpYXQiOjE3NDA1MDg5NDZ9.ndIUUsNAOimuu2Qn1b3PlFHej4bDvoCljUMvpfDDgKE'),
-              'Content-Type': 'application/json;charset=UTF-8'
-            }
-          });
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status} – ${response.statusText}`);
-          }
-          const commands = await response.json();
-          commands.forEach(record => {
-            commandMap[record.Příkaz.toLowerCase()] = record.URL;
-          });
-          localStorage.setItem('commands', JSON.stringify(commandMap));
-          window.commands = commandMap;
-        } catch (error) {
-          console.error('❌ Chyba při načítání příkazů z Tabidoo:', error.message);
-          document.getElementById('output').innerText = 'Chyba při načítání příkazů – zkontrolujte API, připojení, nebo kontaktujte podporu Tabidoo.';
-          // Fallback – použij výchozí příkazy, pokud API selže
-          window.commands = {
-            'vytížení': 'https://app.tabidoo.cloud/public-dashboard/xx6481xx7f',
-            'kapacit': 'https://example.com/kapacit',
-            'graf': 'https://example.com/graf',
-            'video': 'https://youtube.com/video-id',
-            'audio': 'https://example.com/audio.mp3'
-          };
-        }
-      } else {
-        window.commands = commandMap;
-      }
-    });
-
     document.getElementById('start-speech').addEventListener('click', () => {
       recognition.start();
       console.log('🎤 Hlasové rozpoznávání spuštěno...');
@@ -115,21 +75,37 @@
       const lowerCommand = command.toLowerCase();
       console.log(`Rozpoznaný příkaz: ${lowerCommand}`);
 
-      // Hledání shody v načtených příkazech z Tabidoo
-      let foundUrl = null;
-      for (const [cmd, url] of Object.entries(window.commands || {})) {
-        if (lowerCommand.includes(cmd)) { // Použijeme includes místo contains pro přesnější shodu
-          foundUrl = url;
-          break;
-        }
-      }
+      const webhookUrl = "https://hook.eu1.make.com/ns3n8fk70iwoex1kme9af5j6ghh3351x"; // Tvoje webhook URL v Make.com
 
-      if (foundUrl) {
-        console.log(`➡️ Nalezeno URL: ${foundUrl}`);
-        displayContent(foundUrl);
-      } else {
-        console.error("❌ Žádná shoda pro příkaz nebyla nalezena.");
-        document.getElementById('output').innerText = 'Žádný příkaz nebyl nalezen – řekněte jiný příkaz, např. "Zobraz vytížení".';
+      try {
+        const response = await fetch(webhookUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ Povel: lowerCommand }) // Odesíláme celý příkaz v malých písmeních
+        });
+
+        console.log("📡 HTTP status:", response.status);
+
+        const text = await response.text();
+        try {
+          const result = JSON.parse(text);
+          console.log("📡 Odpověď z Make:", result);
+
+          if (result.url) {
+            console.log("➡️ Zpracovávám URL:", result.url);
+            displayContent(result.url);
+          } else {
+            console.error("❌ Chyba: URL nebyla v odpovědi nalezena.");
+            document.getElementById('output').innerText = 'Chyba: URL nebyla nalezena pro tento příkaz.';
+          }
+        } catch (error) {
+          console.error("❌ Chyba při parsování JSON odpovědi:", text);
+          document.getElementById('output').innerText = 'Chyba při zpracování odpovědi z Make.';
+        }
+
+      } catch (error) {
+        console.error("❌ Chyba při komunikaci s Make:", error);
+        document.getElementById('output').innerText = 'Chyba při komunikaci s Make – zkontrolujte připojení.';
       }
     }
 
