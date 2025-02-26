@@ -58,7 +58,7 @@ body {
     }
     #output audio, #output video, #output iframe {
         height: 200px; /* Zmenšení o 15 % (315px × 0.85) */
-        max-width: 100%; /* Plná šířka kontejneru */
+        max-width: 80%; /* Plná šířka kontejneru */
         object-fit: contain; /* Zachování proporce */
     }
 }
