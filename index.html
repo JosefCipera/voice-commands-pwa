@@ -6,11 +6,12 @@
   <title>Chytré já</title>
   <link rel="manifest" href="/voice-commands-pwa/manifest.json">
   <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/png" href="/voice-commands-pwa/microphone-512-transparent.png">
 </head>
 <body>
   <div class="container">
     <div class="top-half">
-      <img src="/voice-commands-pwa/microphone-512.png" alt="Microphone" id="start-speech" class="mic-icon">
+      <img src="/voice-commands-pwa/microphone-512-transparent.png" alt="Microphone" id="start-speech" class="mic-icon">
     </div>
     <div class="bottom-half">
       <div id="output">Řekněte příkaz, např. 'Zobraz vytížení', 'Přehrát video školení', nebo 'Spusť audio návod'.</div>
@@ -113,25 +114,66 @@
       const output = document.getElementById('output');
       output.innerText = `Načítám obsah: ${url}`;
 
-      // Rozpoznání typu URL
+      // Zkontrolujeme, zda je URL platná
+      if (!url || typeof url !== 'string') {
+        output.innerText = 'Neplatná URL – zkontrolujte příkaz.';
+        return;
+      }
+
+      // Rozpoznání typu URL a přehrávání
       if (url.includes('.mp3') || url.includes('.wav')) {
         const audio = document.createElement('audio');
         audio.controls = true;
         audio.src = url;
+        audio.onerror = () => {
+          output.innerText = `Chyba při načítání audia: ${url}. Zkontrolujte URL nebo formát.`;
+        };
         output.innerHTML = '';
         output.appendChild(audio);
-      } else if (url.includes('youtube.com') || url.includes('vimeo.com') || url.includes('.mp4')) {
+      } else if (url.includes('youtube.com') || url.includes('vimeo.com') || url.includes('.mp4') || url.includes('.webm')) {
         const video = document.createElement('video');
         video.controls = true;
         video.width = '100%';
         video.src = url;
+        video.onerror = () => {
+          output.innerText = `Chyba při načítání videa: ${url}. Zkontrolujte URL, CORS, nebo formát (podporuje MP4, WebM).`;
+          // Pokud selže přímé video, zkusíme YouTube/Vimeo přes iframe
+          if (url.includes('youtube.com')) {
+            const youtubeId = new URL(url).searchParams.get('v') || url.split('v=')[1]?.split('&')[0];
+            if (youtubeId) {
+              const iframe = document.createElement('iframe');
+              iframe.width = '100%';
+              iframe.height = '315';
+              iframe.src = `https://www.youtube.com/embed/${youtubeId}`;
+              iframe.allow = 'autoplay; encrypted-media';
+              iframe.allowFullscreen = true;
+              output.innerHTML = '';
+              output.appendChild(iframe);
+            }
+          } else if (url.includes('vimeo.com')) {
+            const vimeoId = url.split('/').pop();
+            if (vimeoId) {
+              const iframe = document.createElement('iframe');
+              iframe.width = '100%';
+              iframe.height = '315';
+              iframe.src = `https://player.vimeo.com/video/${vimeoId}`;
+              iframe.allow = 'autoplay; encrypted-media';
+              iframe.allowFullscreen = true;
+              output.innerHTML = '';
+              output.appendChild(iframe);
+            }
+          }
+        };
         output.innerHTML = '';
         output.appendChild(video);
-      } else if (url.includes('.pdf')) {
+      } else if (url.includes('.pdf') || url.includes('.xls') || url.includes('.xlsx') || url.includes('.ppt') || url.includes('.pptx') || url.includes('.doc') || url.includes('.docx')) {
         const iframe = document.createElement('iframe');
         iframe.width = '100%';
         iframe.height = '500px';
         iframe.src = url;
+        iframe.onerror = () => {
+          output.innerText = `Chyba při načítání souboru: ${url}. Zkontrolujte URL nebo formát.`;
+        };
         output.innerHTML = '';
         output.appendChild(iframe);
       } else {
