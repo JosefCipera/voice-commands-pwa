@@ -41,29 +41,30 @@ body {
     color: #333;
     text-align: center;
     margin-top: 20px;
-    max-width: 90%; /* Zachováme, ale upravíme pro media */
+    max-width: 90%; /* Omezení pro mobil, přepíšeme na desktopu */
     width: auto; /* Umožníme širší obsah */
 }
 
+/* Obecné styly pro media */
 #output audio, #output video, #output iframe {
     max-width: 100%;
     margin: 10px 0;
     object-fit: contain; /* Zachování proporce */
 }
 
-/* Desktop – širší video (700px šířka, 600px výška, přepíšeme omezení kontejneru) */
+/* Desktop – širší video (700px šířka, 600px výška, přepíšeme omezení) */
 @media (min-width: 769px) {
     .mic-icon {
         width: 350px;
     }
     #output {
-        max-width: 700px; /* Omezení šířky #output na 700px pro media */
+        max-width: 700px; /* Omezení šířky #output na 700px */
         width: 700px; /* Explicitní šířka pro media */
     }
     #output audio, #output video, #output iframe {
         height: 600px; /* Zachováme původní výšku */
-        max-width: 700px; /* Širší než mikrofon (700px) */
-        width: 100%; /* Plná šířka v rámci #output */
+        width: 700px; /* Explicitní šířka pro video */
+        max-width: none; /* Odstraníme max-width pro plnou šířku */
         object-fit: contain; /* Zachování poměru stran, přizpůsobení do boxu */
     }
 }
