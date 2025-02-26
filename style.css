@@ -13,7 +13,6 @@ body {
     height: 100%;
     display: flex;
     flex-direction: column;
-    max-width: none !important; /* Odstraníme případné omezení kontejneru */
 }
 
 .top-half, .bottom-half {
@@ -21,7 +20,6 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    max-width: none !important; /* Odstraníme případné omezení */
 }
 
 .mic-icon {
@@ -43,31 +41,25 @@ body {
     color: #333;
     text-align: center;
     margin-top: 20px;
-    max-width: 90%; /* Omezení pro mobil, přepíšeme na desktopu */
+    max-width: 90%;
     width: auto; /* Umožníme širší obsah */
 }
 
-/* Obecné styly pro media */
 #output audio, #output video, #output iframe {
     max-width: 100%;
     margin: 10px 0;
     object-fit: contain; /* Zachování proporce */
 }
 
-/* Desktop – širší video (700px šířka, 600px výška, maximální priorita) */
+/* Desktop – malé video (315px výška, 100% šířka) */
 @media (min-width: 769px) {
     .mic-icon {
         width: 350px;
     }
-    .container, .bottom-half, #output {
-        max-width: 700px !important; /* Priorita pro šířku */
-        width: 700px !important; /* Explicitní šířka pro media */
-    }
     #output audio, #output video, #output iframe {
-        height: 600px; /* Zachováme původní výšku */
-        width: 700px !important; /* Explicitní šířka s prioritou */
-        max-width: none !important; /* Odstraníme max-width pro plnou šířku */
-        object-fit: contain !important; /* Zachování proporce, prioritní nastavení */
+        height: 315px; /* Malá výška pro desktop */
+        max-width: 100%; /* Plná šířka kontejneru */
+        object-fit: contain; /* Zachování proporce */
     }
 }
 
