@@ -45,19 +45,28 @@ body {
     width: auto; /* Umožníme širší obsah */
 }
 
-#output audio, #output video, #output iframe {
-    max-width: 100%;
-    margin: 10px 0;
-    object-fit: contain; /* Zachování proporce */
+/* Styly pro stavové zprávy */
+.error-title {
+    font-size: 24px;
+    color: #4444ff; /* Modrá barva pro nadpis */
+    font-weight: bold;
+    display: block;
+    margin-bottom: 10px;
 }
 
-/* Desktop – zmenšené video (267.75px výška, 100% šířka) */
+.hint {
+    font-size: 16px;
+    color: #333; /* Černá barva pro nápovědu */
+    display: block;
+}
+
+/* Desktop – malé video (zůstává pro konzistentnost, i když se nepoužívá) */
 @media (min-width: 769px) {
     .mic-icon {
         width: 350px;
     }
     #output audio, #output video, #output iframe {
-        height: 315px; /* Zmenšení o 15 % (315px × 0.85) */
+        height: 267.75px; /* Zmenšení o 15 % (315px × 0.85) */
         max-width: 100%; /* Plná šířka kontejneru */
         object-fit: contain; /* Zachování proporce */
     }
@@ -73,7 +82,7 @@ body {
     }
     .bottom-half {
         align-items: flex-start; /* Posuneme obsah (.bottom-half) nahoru na mobilu */
-        padding-top: 40px; /* Zvýšili jsme padding nahoru pro větší posun (z 40px na 80px) */
+        padding-top: 80px; /* Zůstáváme u 80px pro posun nahoru */
     }
     #output audio, #output video, #output iframe {
         height: 400px; /* Zachováme výšku, ale posuneme výš */
