@@ -57,7 +57,7 @@ body {
         width: 350px;
     }
     #output audio, #output video, #output iframe {
-        height: 280px; /* Zmenšení o 15 % (315px × 0.85) */
+        height: 315px; /* Zmenšení o 15 % (315px × 0.85) */
         max-width: 100%; /* Plná šířka kontejneru */
         object-fit: contain; /* Zachování proporce */
     }
@@ -73,7 +73,7 @@ body {
     }
     .bottom-half {
         align-items: flex-start; /* Posuneme obsah (.bottom-half) nahoru na mobilu */
-        padding-top: 120px; /* Zvýšili jsme padding nahoru pro větší posun (z 40px na 80px) */
+        padding-top: 40px; /* Zvýšili jsme padding nahoru pro větší posun (z 40px na 80px) */
     }
     #output audio, #output video, #output iframe {
         height: 400px; /* Zachováme výšku, ale posuneme výš */
