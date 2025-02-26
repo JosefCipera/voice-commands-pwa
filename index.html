@@ -6,7 +6,7 @@
   <title>Chytré já</title>
   <link rel="manifest" href="/voice-commands-pwa/manifest.json">
   <link rel="stylesheet" href="style.css">
-  <link rel="icon" type="image/png" href="/voice-commands-pwa/microphone-512.png"> <!-- Původní ikona pro favicon -->
+  <link rel="icon" type="image/png" href="/voice-commands-pwa/microphone-512.png">
 </head>
 <body>
   <div class="container">
@@ -69,7 +69,7 @@
       const words = command.split(' ').length;
       if (words > 10) {
         console.warn('⚠️ Příkaz je příliš dlouhý – omezte na 10 slov.');
-        document.getElementById('output').innerText = 'Příkaz je příliš dlouhý – řekněte kratší příkaz (max. 10 slov).';
+        document.getElementById('output').innerHTML = '<span class="error-title">Chyba: Příkaz je příliš dlouhý</span><br><span class="hint">Řekněte kratší příkaz (max. 10 slov), např. "Zadej vytížení kapacit".</span>';
         return;
       }
 
@@ -97,16 +97,16 @@
             displayContent(result.url);
           } else {
             console.error("❌ Chyba: URL nebyla v odpovědi nalezena.");
-            document.getElementById('output').innerText = 'Chyba: URL nebyla nalezena pro tento příkaz.';
+            document.getElementById('output').innerHTML = '<span class="error-title">Chyba: Soubor nenalezen</span><br><span class="hint">Zadej vytížení kapacit, např. "Zobraz vytížení".</span>';
           }
         } catch (error) {
           console.error("❌ Chyba při parsování JSON odpovědi:", text);
-          document.getElementById('output').innerText = 'Chyba při zpracování odpovědi z Make.';
+          document.getElementById('output').innerHTML = '<span class="error-title">Chyba: Technická chyba</span><br><span class="hint">Zkontrolujte připojení a zkuste znovu, např. "Zobraz vytížení".</span>';
         }
 
       } catch (error) {
         console.error("❌ Chyba při komunikaci s Make:", error);
-        document.getElementById('output').innerText = 'Chyba při komunikaci s Make – zkontrolujte připojení.';
+        document.getElementById('output').innerHTML = '<span class="error-title">Chyba: Připojení selhalo</span><br><span class="hint">Zkontrolujte internet a zkuste znovu, např. "Zobraz vytížení".</span>';
       }
     }
 
@@ -116,120 +116,15 @@
 
       // Zkontrolujeme, zda je URL platná
       if (!url || typeof url !== 'string') {
-        output.innerText = 'Neplatná URL – zkontrolujte příkaz.';
+        output.innerHTML = '<span class="error-title">Chyba: Neplatná URL</span><br><span class="hint">Zadej platný příkaz, např. "Zobraz vytížení".</span>';
         return;
       }
 
-      // Rozpoznání typu URL a přehrávání/zobrazení
-      if (url.includes('.mp3') || url.includes('.wav') || url.includes('podcasty.seznam.cz')) {
-        // Pokus o přímé přehrávání jako audio
-        const audio = document.createElement('audio');
-        audio.controls = true;
-        audio.src = url;
-        audio.onerror = () => {
-          output.innerText = `Chyba při načítání audia: ${url}. Zkontrolujte URL, CORS, nebo formát (podporuje MP3, WAV).`;
-          // Pokud selže, zkusíme extrahovat přímé audio (pokud známe endpoint)
-          if (url.includes('podcasty.seznam.cz')) {
-            fetch(url)
-              .then(response => response.text())
-              .then(html => {
-                const mp3Match = html.match(/https?:\/\/[^\s]+\.mp3/);
-                if (mp3Match) {
-                  const mp3Url = mp3Match[0];
-                  audio.src = mp3Url;
-                  audio.onerror = () => {
-                    output.innerText = `Chyba při načítání podcastu: ${mp3Url}. Zkontrolujte URL nebo připojení.`;
-                  };
-                  audio.onloadedmetadata = () => {
-                    output.innerText = `Přehrávám podcast: ${mp3Url}`;
-                  };
-                  output.innerHTML = '';
-                  output.appendChild(audio);
-                  audio.play().catch(error => {
-                    console.error('❌ Nelze automaticky přehrát podcast:', error);
-                    output.innerText += ' – Klikněte na tlačítko přehrávání.';
-                  });
-                } else {
-                  output.innerText += ' – Nelze najít přímé audio. Otevírám na stránce...';
-                  window.location.href = url; // Fallback na samostatnou stránku
-                }
-              })
-              .catch(error => {
-                console.error('❌ Chyba při analýze podcastu:', error);
-                output.innerText += ' – Chyba při analýze. Otevírám na stránce...';
-                window.location.href = url; // Fallback na samostatnou stránku
-              });
-          }
-        };
-        audio.onloadedmetadata = () => {
-          output.innerText = `Přehrávám audio: ${url}`;
-        };
-        output.innerHTML = '';
-        output.appendChild(audio);
-        audio.play().catch(error => {
-          console.error('❌ Nelze automaticky přehrát audio:', error);
-          output.innerText += ' – Klikněte na tlačítko přehrávání.';
-        });
-      } else if (url.includes('youtube.com') || url.includes('vimeo.com')) {
-        let iframeSrc = '';
-        if (url.includes('youtube.com')) {
-          const youtubeId = new URL(url).searchParams.get('v') || url.split('v=')[1]?.split('&')[0];
-          if (youtubeId) {
-            iframeSrc = `https://www.youtube.com/embed/${youtubeId}`;
-          }
-        } else if (url.includes('vimeo.com')) {
-          const vimeoId = url.split('/').pop();
-          if (vimeoId) {
-            iframeSrc = `https://player.vimeo.com/video/${vimeoId}`;
-          }
-        }
-        if (iframeSrc) {
-          const iframe = document.createElement('iframe');
-          iframe.width = '100%';
-          iframe.height = '600px'; // Větší výška pro desktop
-          iframe.src = iframeSrc;
-          iframe.allow = 'autoplay; encrypted-media; fullscreen';
-          iframe.allowFullscreen = true;
-          iframe.onerror = () => {
-            output.innerText = `Chyba při načítání videa: ${url}. Zkontrolujte URL nebo připojení.`;
-          };
-          output.innerHTML = '';
-          output.appendChild(iframe);
-        } else {
-          output.innerText = `Neplatná URL videa: ${url}. Zkontrolujte formát YouTube/Vimeo.`;
-        }
-      } else if (url.includes('.mp4') || url.includes('.webm')) {
-        const video = document.createElement('video');
-        video.controls = true;
-        video.width = '100%';
-        video.height = '600px'; // Větší výška pro desktop
-        video.src = url;
-        video.onerror = () => {
-          output.innerText = `Chyba při načítání videa: ${url}. Zkontrolujte URL, CORS, nebo formát (podporuje MP4, WebM).`;
-          // Pokus o YouTube/Vimeo, pokud to není přímé video
-          if (url.includes('youtube.com') || url.includes('vimeo.com')) {
-            displayContent(url); // Rekurzivní volání pro zpracování YouTube/Vimeo
-          }
-        };
-        video.onloadedmetadata = () => {
-          output.innerText = `Přehrávám video: ${url}`;
-        };
-        output.innerHTML = '';
-        output.appendChild(video);
-        video.play().catch(error => {
-          console.error('❌ Nelze automaticky přehrát video:', error);
-          output.innerText += ' – Klikněte na tlačítko přehrávání.';
-        });
+      // Rozpoznání typu URL a přesměrování na novou stránku
+      if (url.includes('.mp3') || url.includes('.wav') || url.includes('podcasty.seznam.cz') || url.includes('youtube.com') || url.includes('vimeo.com') || url.includes('.mp4') || url.includes('.webm')) {
+        window.location.href = url; // Otevření audio/video na samostatné stránce
       } else if (url.includes('.pdf') || url.includes('.xls') || url.includes('.xlsx') || url.includes('.ppt') || url.includes('.pptx') || url.includes('.doc') || url.includes('.docx')) {
-        const iframe = document.createElement('iframe');
-        iframe.width = '100%';
-        iframe.height = '500px';
-        iframe.src = `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`;
-        iframe.onerror = () => {
-          output.innerText = `Chyba při načítání souboru: ${url}. Otevírám na samostatné stránce...`;
-        };
-        output.innerHTML = '';
-        output.appendChild(iframe);
+        window.location.href = `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=false`; // Otevření dokumentů na samostatné stránce v Google Docs Viewer
       } else if (url.includes('app.tabidoo.cloud/public-dashboard') || url.includes('public') || url.includes('dashboard')) {
         // Otevření veřejných dashboardů na samostatné stránce
         window.location.href = url;
