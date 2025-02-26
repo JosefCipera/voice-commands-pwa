@@ -45,18 +45,19 @@ body {
 }
 
 #output audio, #output video, #output iframe {
-    max-width: 200%; /* 2x širší na desktopu, omezené kontejnerem */
+    max-width: 100%;
     margin: 10px 0;
 }
 
-/* Desktop – větší video (2x větší ve výšce i šířce) */
+/* Desktop – širší video (700px šířka, 600px výška) */
 @media (min-width: 769px) {
     .mic-icon {
         width: 350px;
     }
     #output audio, #output video, #output iframe {
-        height: 1200px; /* 2x větší výška (2x 600px) */
-        max-width: 200%; /* 2x širší, omezené kontejnerem */
+        height: 600px; /* Zachováme původní výšku */
+        max-width: 700px; /* Širší než mikrofon (2x 350px) */
+        object-fit: contain; /* Zachování poměru stran, přizpůsobení do boxu */
     }
 }
 
