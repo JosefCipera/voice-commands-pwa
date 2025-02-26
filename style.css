@@ -37,7 +37,7 @@ body {
     opacity: 0.7; /* Změníme průhlednost během nahrávání */
 }
 
-/* Animace vysílacích vln */
+/* Opravená animace vysílacích vln – zajistíme správnou velikost a pozici */
 @keyframes pulse {
     0% {
         transform: scale(0.1);
@@ -59,45 +59,11 @@ body {
     animation: pulse 2s infinite ease-out;
     pointer-events: none; /* Aby animace nebránila klikání */
     z-index: 1; /* Nad mikrofonem, pod možnými překryty */
+    top: 0;
+    left: 0;
 }
 
-#output {
-    font-size: 18px;
-    color: #333;
-    text-align: center;
-    margin-top: 20px;
-    max-width: 90%;
-    width: auto; /* Umožníme širší obsah */
-}
-
-/* Styly pro stavové zprávy */
-.status {
-    font-size: 20px;
-    color: #4444ff; /* Modrá barva pro stav */
-    font-weight: normal; /* Neboldované */
-    display: block;
-    margin-bottom: 10px;
-}
-
-.hint {
-    font-size: 18px;
-    color: #333; /* Černá barva pro nápovědu */
-    display: block;
-}
-
-/* Desktop – malé video (zůstává pro konzistentnost, i když se nepoužívá) */
-@media (min-width: 769px) {
-    .mic-icon {
-        width: 350px;
-    }
-    #output audio, #output video, #output iframe {
-        height: 267.75px; /* Zmenšení o 15 % (315px × 0.85) */
-        max-width: 100%; /* Plná šířka kontejneru */
-        object-fit: contain; /* Zachování proporce */
-    }
-}
-
-/* Mobil – video posunuté nahoru (vrátíme k původnímu nastavení) */
+/* Mobilní úprava animace a ikony */
 @media (max-width: 768px) {
     .mic-icon {
         width: 50vw; /* Polovina šířky mobilu */
@@ -115,10 +81,43 @@ body {
         padding-top: 80px; /* Zůstáváme u 80px pro posun nahoru */
     }
     #output audio, #output video, #output iframe {
-        height: 400px; /* Zachováme původní výšku */
+        height: 400px; /* Původní výška pro mobil */
         max-width: 100%; /* Normální šířka na mobilu */
     }
-    #output {
-        font-size: 16px; /* Menší text na mobilu, ale nápověda je 18px díky .hint */
+}
+
+/* Desktop – malé video (zachováváme původní velikost) */
+@media (min-width: 769px) {
+    .mic-icon {
+        width: 350px;
     }
+    #output audio, #output video, #output iframe {
+        height: 267.75px; /* Zmenšení o 15 % (315px × 0.85) */
+        max-width: 100%; /* Plná šířka kontejneru */
+        object-fit: contain; /* Zachování proporce */
+    }
+}
+
+/* Styly pro stavové zprávy */
+#output {
+    font-size: 18px;
+    color: #333;
+    text-align: center;
+    margin-top: 20px;
+    max-width: 90%;
+    width: auto; /* Umožníme širší obsah */
+}
+
+.status {
+    font-size: 24px;
+    color: #4444ff; /* Modrá barva pro stav */
+    font-weight: normal; /* Neboldované */
+    display: block;
+    margin-bottom: 10px;
+}
+
+.hint {
+    font-size: 18px;
+    color: #333; /* Černá barva pro nápovědu */
+    display: block;
 }
