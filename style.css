@@ -92,3 +92,56 @@ body {
         font-size: 16px; /* Menší text na mobilu */
     }
 }
+
+/* Přidáme po existujícím CSS v style.css */
+
+/* Animace vysílacích vln */
+@keyframes pulse {
+    0% {
+        transform: scale(0.1);
+        opacity: 0.5;
+    }
+    100% {
+        transform: scale(1.5);
+        opacity: 0;
+    }
+}
+
+.mic-icon.recording::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: rgba(68, 68, 255, 0.3); /* Poloprůhledná modrá barva jako vlny */
+    animation: pulse 2s infinite ease-out;
+    pointer-events: none; /* Aby animace nebránila klikání */
+    z-index: 1; /* Nad mikrofonem, pod možnými překryty */
+}
+
+/* Upravíme .mic-icon, aby umožnil absolutní pozici pro ::after */
+.mic-icon {
+    width: 350px; /* Pevná šířka pro desktop */
+    height: auto; /* Zachování poměru */
+    cursor: pointer;
+    transition: opacity 0.3s; /* Změníme na opacity pro lepší efekt */
+    background: #ffffff; /* Bílé pozadí pro lepší kontrast na desktopu */
+    border-radius: 10px; /* Lehké zaokrouhlení pro estetiku */
+    padding: 5px; /* Levé okraje pro průhlednou ikonu */
+    position: relative; /* Pro absolutní pozici ::after */
+}
+
+/* Mobilní úprava animace */
+@media (max-width: 768px) {
+    .mic-icon.recording::after {
+        background: rgba(68, 68, 255, 0.3); /* Stejná barva na mobilu */
+        animation: pulse 2s infinite ease-out;
+    }
+    .mic-icon {
+        width: 50vw; /* Polovina šířky mobilu */
+        max-width: none; /* Žádné omezení na mobilu */
+        background: transparent; /* Bez pozadí na mobilu, aby kontrastoval s modrou plochou */
+        border: 2px solid #4444ff; /* Modrý okraj pro lepší viditelnost na mobilu */
+        position: relative; /* Pro absolutní pozici ::after */
+    }
+}
