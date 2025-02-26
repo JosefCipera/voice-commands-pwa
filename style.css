@@ -51,19 +51,19 @@ body {
     object-fit: contain; /* Zachování proporce */
 }
 
-/* Desktop – malé video (315px výška, 100% šířka) */
+/* Desktop – zmenšené video (267.75px výška, 100% šířka) */
 @media (min-width: 769px) {
     .mic-icon {
         width: 350px;
     }
     #output audio, #output video, #output iframe {
-        height: 315px; /* Malá výška pro desktop */
+        height: 267.75px; /* Zmenšení o 15 % (315px × 0.85) */
         max-width: 100%; /* Plná šířka kontejneru */
         object-fit: contain; /* Zachování proporce */
     }
 }
 
-/* Mobil – video o něco výš (posunuté nahoru, zachováme výšku 400px) */
+/* Mobil – video posunuté dále nahoru (zachováme výšku 400px) */
 @media (max-width: 768px) {
     .mic-icon {
         width: 50vw; /* Polovina šířky mobilu */
@@ -73,7 +73,7 @@ body {
     }
     .bottom-half {
         align-items: flex-start; /* Posuneme obsah (.bottom-half) nahoru na mobilu */
-        padding-top: 40px; /* Více paddingu nahoru pro posun výš */
+        padding-top: 80px; /* Zvýšili jsme padding nahoru pro větší posun (z 40px na 80px) */
     }
     #output audio, #output video, #output iframe {
         height: 400px; /* Zachováme výšku, ale posuneme výš */
