@@ -6,12 +6,12 @@
   <title>Chytré já</title>
   <link rel="manifest" href="/voice-commands-pwa/manifest.json">
   <link rel="stylesheet" href="style.css">
-  <link rel="icon" type="image/png" href="/voice-commands-pwa/microphone-512-transparent.png">
+  <link rel="icon" type="image/png" href="/voice-commands-pwa/microphone-512.png"> <!-- Původní ikona pro favicon -->
 </head>
 <body>
   <div class="container">
     <div class="top-half">
-      <img src="/voice-commands-pwa/microphone-512-transparent.png" alt="Microphone" id="start-speech" class="mic-icon">
+      <img src="/voice-commands-pwa/microphone-512.png" alt="Microphone" id="start-speech" class="mic-icon">
     </div>
     <div class="bottom-half">
       <div id="output">Řekněte příkaz, např. 'Zobraz vytížení', 'Přehrát video školení', nebo 'Spusť audio návod'.</div>
@@ -121,12 +121,45 @@
       }
 
       // Rozpoznání typu URL a přehrávání/zobrazení
-      if (url.includes('.mp3') || url.includes('.wav')) {
+      if (url.includes('.mp3') || url.includes('.wav') || url.includes('podcasty.seznam.cz')) {
+        // Pokus o přímé přehrávání jako audio
         const audio = document.createElement('audio');
         audio.controls = true;
         audio.src = url;
         audio.onerror = () => {
           output.innerText = `Chyba při načítání audia: ${url}. Zkontrolujte URL, CORS, nebo formát (podporuje MP3, WAV).`;
+          // Pokud selže, zkusíme extrahovat přímé audio (pokud známe endpoint)
+          if (url.includes('podcasty.seznam.cz')) {
+            fetch(url)
+              .then(response => response.text())
+              .then(html => {
+                const mp3Match = html.match(/https?:\/\/[^\s]+\.mp3/);
+                if (mp3Match) {
+                  const mp3Url = mp3Match[0];
+                  audio.src = mp3Url;
+                  audio.onerror = () => {
+                    output.innerText = `Chyba při načítání podcastu: ${mp3Url}. Zkontrolujte URL nebo připojení.`;
+                  };
+                  audio.onloadedmetadata = () => {
+                    output.innerText = `Přehrávám podcast: ${mp3Url}`;
+                  };
+                  output.innerHTML = '';
+                  output.appendChild(audio);
+                  audio.play().catch(error => {
+                    console.error('❌ Nelze automaticky přehrát podcast:', error);
+                    output.innerText += ' – Klikněte na tlačítko přehrávání.';
+                  });
+                } else {
+                  output.innerText += ' – Nelze najít přímé audio. Otevírám na stránce...';
+                  window.location.href = url; // Fallback na samostatnou stránku
+                }
+              })
+              .catch(error => {
+                console.error('❌ Chyba při analýze podcastu:', error);
+                output.innerText += ' – Chyba při analýze. Otevírám na stránce...';
+                window.location.href = url; // Fallback na samostatnou stránku
+              });
+          }
         };
         audio.onloadedmetadata = () => {
           output.innerText = `Přehrávám audio: ${url}`;
@@ -153,7 +186,7 @@
         if (iframeSrc) {
           const iframe = document.createElement('iframe');
           iframe.width = '100%';
-          iframe.height = '315';
+          iframe.height = '600px'; // Větší výška pro desktop
           iframe.src = iframeSrc;
           iframe.allow = 'autoplay; encrypted-media; fullscreen';
           iframe.allowFullscreen = true;
@@ -169,6 +202,7 @@
         const video = document.createElement('video');
         video.controls = true;
         video.width = '100%';
+        video.height = '600px'; // Větší výška pro desktop
         video.src = url;
         video.onerror = () => {
           output.innerText = `Chyba při načítání videa: ${url}. Zkontrolujte URL, CORS, nebo formát (podporuje MP4, WebM).`;
