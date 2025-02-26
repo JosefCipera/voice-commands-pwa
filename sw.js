@@ -5,8 +5,8 @@ const URLS_TO_CACHE = [
   '/voice-commands-pwa/index.html',    
   '/voice-commands-pwa/app.js',        
   '/voice-commands-pwa/manifest.json', 
-  'microphone-192.png', 
-  'microphone-512.png'
+  '/voice-commands-pwa/microphone-192.png', 
+  '/voice-commands-pwa/microphone-512.png'
 ];
 
 // Instalace Service Workeru
