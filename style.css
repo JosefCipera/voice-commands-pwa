@@ -30,70 +30,12 @@ body {
     background: #ffffff; /* Bílé pozadí pro lepší kontrast na desktopu */
     border-radius: 10px; /* Lehké zaokrouhlení pro estetiku */
     padding: 5px; /* Levé okraje pro průhlednou ikonu */
+    position: relative; /* Pro absolutní pozici ::after */
 }
 
 .mic-icon.recording {
     opacity: 0.7; /* Změníme průhlednost během nahrávání */
 }
-
-#output {
-    font-size: 18px;
-    color: #333;
-    text-align: center;
-    margin-top: 20px;
-    max-width: 90%;
-    width: auto; /* Umožníme širší obsah */
-}
-
-/* Styly pro stavové zprávy */
-.error-title {
-    font-size: 24px;
-    color: #4444ff; /* Modrá barva pro nadpis */
-    font-weight: bold;
-    display: block;
-    margin-bottom: 10px;
-}
-
-.hint {
-    font-size: 16px;
-    color: #333; /* Černá barva pro nápovědu */
-    display: block;
-}
-
-/* Desktop – malé video (zůstává pro konzistentnost, i když se nepoužívá) */
-@media (min-width: 769px) {
-    .mic-icon {
-        width: 350px;
-    }
-    #output audio, #output video, #output iframe {
-        height: 267.75px; /* Zmenšení o 15 % (315px × 0.85) */
-        max-width: 100%; /* Plná šířka kontejneru */
-        object-fit: contain; /* Zachování proporce */
-    }
-}
-
-/* Mobil – video posunuté dále nahoru (zachováme výšku 400px) */
-@media (max-width: 768px) {
-    .mic-icon {
-        width: 50vw; /* Polovina šířky mobilu */
-        max-width: none; /* Žádné omezení na mobilu */
-        background: transparent; /* Bez pozadí na mobilu, aby kontrastoval s modrou plochou */
-        border: 2px solid #4444ff; /* Modrý okraj pro lepší viditelnost na mobilu */
-    }
-    .bottom-half {
-        align-items: flex-start; /* Posuneme obsah (.bottom-half) nahoru na mobilu */
-        padding-top: 80px; /* Zůstáváme u 80px pro posun nahoru */
-    }
-    #output audio, #output video, #output iframe {
-        height: 400px; /* Zachováme výšku, ale posuneme výš */
-        max-width: 100%; /* Normální šířka na mobilu */
-    }
-    #output {
-        font-size: 16px; /* Menší text na mobilu */
-    }
-}
-
-/* Přidáme po existujícím CSS v style.css */
 
 /* Animace vysílacích vln */
 @keyframes pulse {
@@ -119,29 +61,64 @@ body {
     z-index: 1; /* Nad mikrofonem, pod možnými překryty */
 }
 
-/* Upravíme .mic-icon, aby umožnil absolutní pozici pro ::after */
-.mic-icon {
-    width: 350px; /* Pevná šířka pro desktop */
-    height: auto; /* Zachování poměru */
-    cursor: pointer;
-    transition: opacity 0.3s; /* Změníme na opacity pro lepší efekt */
-    background: #ffffff; /* Bílé pozadí pro lepší kontrast na desktopu */
-    border-radius: 10px; /* Lehké zaokrouhlení pro estetiku */
-    padding: 5px; /* Levé okraje pro průhlednou ikonu */
-    position: relative; /* Pro absolutní pozici ::after */
+#output {
+    font-size: 18px;
+    color: #333;
+    text-align: center;
+    margin-top: 20px;
+    max-width: 90%;
+    width: auto; /* Umožníme širší obsah */
 }
 
-/* Mobilní úprava animace */
-@media (max-width: 768px) {
-    .mic-icon.recording::after {
-        background: rgba(68, 68, 255, 0.3); /* Stejná barva na mobilu */
-        animation: pulse 2s infinite ease-out;
+/* Styly pro stavové zprávy */
+.status {
+    font-size: 20px;
+    color: #4444ff; /* Modrá barva pro stav */
+    font-weight: normal; /* Neboldované */
+    display: block;
+    margin-bottom: 10px;
+}
+
+.hint {
+    font-size: 18px;
+    color: #333; /* Černá barva pro nápovědu */
+    display: block;
+}
+
+/* Desktop – malé video (zůstává pro konzistentnost, i když se nepoužívá) */
+@media (min-width: 769px) {
+    .mic-icon {
+        width: 350px;
     }
+    #output audio, #output video, #output iframe {
+        height: 267.75px; /* Zmenšení o 15 % (315px × 0.85) */
+        max-width: 100%; /* Plná šířka kontejneru */
+        object-fit: contain; /* Zachování proporce */
+    }
+}
+
+/* Mobil – video posunuté nahoru (vrátíme k původnímu nastavení) */
+@media (max-width: 768px) {
     .mic-icon {
         width: 50vw; /* Polovina šířky mobilu */
         max-width: none; /* Žádné omezení na mobilu */
         background: transparent; /* Bez pozadí na mobilu, aby kontrastoval s modrou plochou */
         border: 2px solid #4444ff; /* Modrý okraj pro lepší viditelnost na mobilu */
         position: relative; /* Pro absolutní pozici ::after */
+    }
+    .mic-icon.recording::after {
+        background: rgba(68, 68, 255, 0.3); /* Stejná barva na mobilu */
+        animation: pulse 2s infinite ease-out;
+    }
+    .bottom-half {
+        align-items: flex-start; /* Posuneme obsah (.bottom-half) nahoru na mobilu */
+        padding-top: 80px; /* Zůstáváme u 80px pro posun nahoru */
+    }
+    #output audio, #output video, #output iframe {
+        height: 400px; /* Zachováme původní výšku */
+        max-width: 100%; /* Normální šířka na mobilu */
+    }
+    #output {
+        font-size: 16px; /* Menší text na mobilu, ale nápověda je 18px díky .hint */
     }
 }
