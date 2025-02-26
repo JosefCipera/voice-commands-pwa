@@ -68,8 +68,8 @@
     async function handleCommand(command) {
       const words = command.split(' ').length;
       if (words > 10) {
-        console.warn('⚠️ Příkaz je příliš dlouhý – omezte na 10 slov.');
-        document.getElementById('output').innerHTML = '<span class="error-title">Chyba: Příkaz je příliš dlouhý</span><br><span class="hint">Řekněte kratší příkaz (max. 10 slov), např. "Zadej vytížení kapacit".</span>';
+        console.warn('⚠️ Příkaz je příliš dlouhý.');
+        document.getElementById('output').innerHTML = '<span class="status">Soubor nenalezen</span><br><span class="hint">Řekněte příkaz, např. "Zobraz vytížení", "Přehrát video školení", nebo "Spusť audio návod".</span>';
         return;
       }
 
@@ -96,17 +96,17 @@
             console.log("➡️ Zpracovávám URL:", result.url);
             displayContent(result.url);
           } else {
-            console.error("❌ Chyba: URL nebyla v odpovědi nalezena.");
-            document.getElementById('output').innerHTML = '<span class="error-title">Chyba: Soubor nenalezen</span><br><span class="hint">Zadej vytížení kapacit, např. "Zobraz vytížení".</span>';
+            console.error("❌ URL nebyla v odpovědi nalezena.");
+            document.getElementById('output').innerHTML = '<span class="status">Soubor nenalezen</span><br><span class="hint">Řekněte příkaz, např. "Zobraz vytížení", "Přehrát video školení", nebo "Spusť audio návod".</span>';
           }
         } catch (error) {
           console.error("❌ Chyba při parsování JSON odpovědi:", text);
-          document.getElementById('output').innerHTML = '<span class="error-title">Chyba: Technická chyba</span><br><span class="hint">Zkontrolujte připojení a zkuste znovu, např. "Zobraz vytížení".</span>';
+          document.getElementById('output').innerHTML = '<span class="status">Technická chyba</span><br><span class="hint">Zkontrolujte připojení a zkuste znovu, např. "Zobraz vytížení", "Přehrát video školení", nebo "Spusť audio návod".</span>';
         }
 
       } catch (error) {
         console.error("❌ Chyba při komunikaci s Make:", error);
-        document.getElementById('output').innerHTML = '<span class="error-title">Chyba: Připojení selhalo</span><br><span class="hint">Zkontrolujte internet a zkuste znovu, např. "Zobraz vytížení".</span>';
+        document.getElementById('output').innerHTML = '<span class="status">Připojení selhalo</span><br><span class="hint">Zkontrolujte internet a zkuste znovu, např. "Zobraz vytížení", "Přehrát video školení", nebo "Spusť audio návod".</span>';
       }
     }
 
@@ -116,7 +116,7 @@
 
       // Zkontrolujeme, zda je URL platná
       if (!url || typeof url !== 'string') {
-        output.innerHTML = '<span class="error-title">Chyba: Neplatná URL</span><br><span class="hint">Zadej platný příkaz, např. "Zobraz vytížení".</span>';
+        output.innerHTML = '<span class="status">Neplatná URL</span><br><span class="hint">Řekněte příkaz, např. "Zobraz vytížení", "Přehrát video školení", nebo "Spusť audio návod".</span>';
         return;
       }
 
