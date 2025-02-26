@@ -120,64 +120,88 @@
         return;
       }
 
-      // Rozpoznání typu URL a přehrávání
+      // Rozpoznání typu URL a přehrávání/zobrazení
       if (url.includes('.mp3') || url.includes('.wav')) {
         const audio = document.createElement('audio');
         audio.controls = true;
         audio.src = url;
         audio.onerror = () => {
-          output.innerText = `Chyba při načítání audia: ${url}. Zkontrolujte URL nebo formát.`;
+          output.innerText = `Chyba při načítání audia: ${url}. Zkontrolujte URL, CORS, nebo formát (podporuje MP3, WAV).`;
+        };
+        audio.onloadedmetadata = () => {
+          output.innerText = `Přehrávám audio: ${url}`;
         };
         output.innerHTML = '';
         output.appendChild(audio);
-      } else if (url.includes('youtube.com') || url.includes('vimeo.com') || url.includes('.mp4') || url.includes('.webm')) {
+        audio.play().catch(error => {
+          console.error('❌ Nelze automaticky přehrát audio:', error);
+          output.innerText += ' – Klikněte na tlačítko přehrávání.';
+        });
+      } else if (url.includes('youtube.com') || url.includes('vimeo.com')) {
+        let iframeSrc = '';
+        if (url.includes('youtube.com')) {
+          const youtubeId = new URL(url).searchParams.get('v') || url.split('v=')[1]?.split('&')[0];
+          if (youtubeId) {
+            iframeSrc = `https://www.youtube.com/embed/${youtubeId}`;
+          }
+        } else if (url.includes('vimeo.com')) {
+          const vimeoId = url.split('/').pop();
+          if (vimeoId) {
+            iframeSrc = `https://player.vimeo.com/video/${vimeoId}`;
+          }
+        }
+        if (iframeSrc) {
+          const iframe = document.createElement('iframe');
+          iframe.width = '100%';
+          iframe.height = '315';
+          iframe.src = iframeSrc;
+          iframe.allow = 'autoplay; encrypted-media; fullscreen';
+          iframe.allowFullscreen = true;
+          iframe.onerror = () => {
+            output.innerText = `Chyba při načítání videa: ${url}. Zkontrolujte URL nebo připojení.`;
+          };
+          output.innerHTML = '';
+          output.appendChild(iframe);
+        } else {
+          output.innerText = `Neplatná URL videa: ${url}. Zkontrolujte formát YouTube/Vimeo.`;
+        }
+      } else if (url.includes('.mp4') || url.includes('.webm')) {
         const video = document.createElement('video');
         video.controls = true;
         video.width = '100%';
         video.src = url;
         video.onerror = () => {
           output.innerText = `Chyba při načítání videa: ${url}. Zkontrolujte URL, CORS, nebo formát (podporuje MP4, WebM).`;
-          // Pokud selže přímé video, zkusíme YouTube/Vimeo přes iframe
-          if (url.includes('youtube.com')) {
-            const youtubeId = new URL(url).searchParams.get('v') || url.split('v=')[1]?.split('&')[0];
-            if (youtubeId) {
-              const iframe = document.createElement('iframe');
-              iframe.width = '100%';
-              iframe.height = '315';
-              iframe.src = `https://www.youtube.com/embed/${youtubeId}`;
-              iframe.allow = 'autoplay; encrypted-media';
-              iframe.allowFullscreen = true;
-              output.innerHTML = '';
-              output.appendChild(iframe);
-            }
-          } else if (url.includes('vimeo.com')) {
-            const vimeoId = url.split('/').pop();
-            if (vimeoId) {
-              const iframe = document.createElement('iframe');
-              iframe.width = '100%';
-              iframe.height = '315';
-              iframe.src = `https://player.vimeo.com/video/${vimeoId}`;
-              iframe.allow = 'autoplay; encrypted-media';
-              iframe.allowFullscreen = true;
-              output.innerHTML = '';
-              output.appendChild(iframe);
-            }
+          // Pokus o YouTube/Vimeo, pokud to není přímé video
+          if (url.includes('youtube.com') || url.includes('vimeo.com')) {
+            displayContent(url); // Rekurzivní volání pro zpracování YouTube/Vimeo
           }
+        };
+        video.onloadedmetadata = () => {
+          output.innerText = `Přehrávám video: ${url}`;
         };
         output.innerHTML = '';
         output.appendChild(video);
+        video.play().catch(error => {
+          console.error('❌ Nelze automaticky přehrát video:', error);
+          output.innerText += ' – Klikněte na tlačítko přehrávání.';
+        });
       } else if (url.includes('.pdf') || url.includes('.xls') || url.includes('.xlsx') || url.includes('.ppt') || url.includes('.pptx') || url.includes('.doc') || url.includes('.docx')) {
         const iframe = document.createElement('iframe');
         iframe.width = '100%';
         iframe.height = '500px';
-        iframe.src = url;
+        iframe.src = `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`;
         iframe.onerror = () => {
-          output.innerText = `Chyba při načítání souboru: ${url}. Zkontrolujte URL nebo formát.`;
+          output.innerText = `Chyba při načítání souboru: ${url}. Otevírám na samostatné stránce...`;
         };
         output.innerHTML = '';
         output.appendChild(iframe);
+      } else if (url.includes('app.tabidoo.cloud/public-dashboard') || url.includes('public') || url.includes('dashboard')) {
+        // Otevření veřejných dashboardů na samostatné stránce
+        window.location.href = url;
       } else {
-        window.location.href = url; // Pro stránky, dashboardy, grafy
+        // Ostatní URL (stránky, grafy) otevřeme na samostatné stránce
+        window.location.href = url;
       }
     }
   </script>
