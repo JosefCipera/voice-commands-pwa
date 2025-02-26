@@ -27,6 +27,9 @@ body {
     height: auto; /* Zachování poměru */
     cursor: pointer;
     transition: opacity 0.3s; /* Změníme na opacity pro lepší efekt */
+    background: #ffffff; /* Bílé pozadí pro lepší kontrast na desktopu */
+    border-radius: 10px; /* Lehké zaokrouhlení pro estetiku */
+    padding: 5px; /* Levé okraje pro průhlednou ikonu */
 }
 
 .mic-icon.recording {
@@ -41,11 +44,37 @@ body {
     max-width: 90%;
 }
 
-/* Mobilní verze */
+#output audio, #output video, #output iframe {
+    max-width: 200%; /* 2x širší na desktopu, omezené kontejnerem */
+    margin: 10px 0;
+}
+
+/* Desktop – větší video (2x větší ve výšce i šířce) */
+@media (min-width: 769px) {
+    .mic-icon {
+        width: 350px;
+    }
+    #output audio, #output video, #output iframe {
+        height: 1200px; /* 2x větší výška (2x 600px) */
+        max-width: 200%; /* 2x širší, omezené kontejnerem */
+    }
+}
+
+/* Mobil – video o něco výš (posunuté nahoru, zachováme výšku 400px) */
 @media (max-width: 768px) {
     .mic-icon {
         width: 50vw; /* Polovina šířky mobilu */
         max-width: none; /* Žádné omezení na mobilu */
+        background: transparent; /* Bez pozadí na mobilu, aby kontrastoval s modrou plochou */
+        border: 2px solid #4444ff; /* Modrý okraj pro lepší viditelnost na mobilu */
+    }
+    .bottom-half {
+        align-items: flex-start; /* Posuneme obsah (.bottom-half) nahoru na mobilu */
+        padding-top: 40px; /* Více paddingu nahoru pro posun výš */
+    }
+    #output audio, #output video, #output iframe {
+        height: 400px; /* Zachováme výšku, ale posuneme výš */
+        max-width: 100%; /* Normální šířka na mobilu */
     }
     #output {
         font-size: 16px; /* Menší text na mobilu */
