@@ -1,11 +1,10 @@
 body {
     margin: 0;
     height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    display: block; /* Změníme na block, abychom odstranili flex omezení */
     background-color: #f0f0f0;
     font-family: Arial, sans-serif;
+    overflow-x: hidden; /* Zabrání horizontálnímu scrollování */
 }
 
 .container {
@@ -14,6 +13,7 @@ body {
     display: flex;
     flex-direction: column;
     position: relative; /* Pro umístění videa mimo kontejner */
+    max-width: none !important; /* Odstraníme případné omezení šířky */
 }
 
 .top-half, .bottom-half {
@@ -21,6 +21,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    max-width: none !important; /* Odstraníme případné omezení */
 }
 
 .mic-icon {
@@ -42,8 +43,8 @@ body {
     color: #333;
     text-align: center;
     margin-top: 0px; /* Blízkost k mikrofonu */
-    max-width: 90%;
-    width: auto; /* Umožníme širší obsah */
+    max-width: none !important; /* Odstraníme omezení šířky */
+    width: auto; /* Umožníme plnou šířku */
 }
 
 /* Styly pro stavové zprávy */
@@ -61,28 +62,28 @@ body {
     display: block;
 }
 
-/* Desktop – zvětšené video mimo kontejner */
+/* Desktop – zvětšené video mimo kontejner, plná šířka */
 @media (min-width: 769px) {
     .mic-icon {
         width: 350px;
     }
+    .container, .bottom-half {
+        max-width: none !important; /* Odstraníme případné omezení */
+        width: 100%; /* Plná šířka kontejneru */
+    }
     #output {
-        position: absolute; /* Umístíme video mimo .bottom-half */
-        top: 50%; /* Vycentrování vertikálně */
+        position: fixed; /* Umístíme video mimo .bottom-half a kontejner na celou stránku */
+        top: 50%;
         left: 0;
-        width: 100vw; /* Plná šířka stránky */
+        width: 100vw !important; /* Plná šířka viewportu s prioritou */
         transform: translateY(-50%); /* Vycentrování vertikálně */
-        z-index: 1; /* Aby bylo nad mikrofonem */
+        z-index: 1000; /* Vysoce nad ostatními prvky */
     }
     #output audio, #output video, #output iframe {
-        height: 600px; /* Zvětšená výška pro 16:9 poměr (typický pro videa) */
-        width: 100%; /* Plná šířka kontejneru */
-        max-width: 100vw; /* Omezení na šířku viewportu */
+        height: 600px; /* Zvětšená výška pro 16:9 poměr */
+        width: 100vw !important; /* Plná šířka viewportu s prioritou */
+        max-width: none !important; /* Odstraníme případné omezení */
         object-fit: contain; /* Zachování proporce bez deformace */
-    }
-    .bottom-half {
-        position: relative; /* Pro absolutní pozici #output */
-        z-index: 0; /* Pod videem */
     }
 }
 
