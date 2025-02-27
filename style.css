@@ -19,7 +19,7 @@ html {
     height: 100%;
     display: flex;
     flex-direction: column;
-    position: relative; /* Pro umístění videa mimo kontejner */
+    position: relative; /* Pro umístění videa v rámci kontejneru */
     max-width: none !important; /* Odstraníme případné omezení šířky */
     box-sizing: border-box; /* Zajistíme správné výpočty */
 }
@@ -54,7 +54,7 @@ html {
     text-align: center;
     margin-top: 0px; /* Blízkost k mikrofonu */
     max-width: none !important; /* Odstraníme omezení šířky */
-    width: auto; /* Umožníme plnou šířku */
+    width: 100%; /* Plná šířka kontejneru */
     box-sizing: border-box; /* Zajistíme správné výpočty */
 }
 
@@ -73,7 +73,7 @@ html {
     display: block;
 }
 
-/* Desktop – zvětšené video mimo kontejner, plná šířka */
+/* Desktop – zvětšené video pod mikrofonem, plná šířka */
 @media (min-width: 769px) {
     .mic-icon {
         width: 350px;
@@ -83,14 +83,10 @@ html {
         width: 100%; /* Plná šířka kontejneru */
     }
     #output {
-        position: fixed; /* Umístíme video mimo .bottom-half a kontejner na celou stránku */
-        top: 50%;
-        left: 0;
+        position: relative; /* Vrátíme video do .bottom-half */
         width: 100vw !important; /* Plná šířka viewportu s prioritou */
-        transform: translateY(-50%); /* Vycentrování vertikálně */
-        z-index: 1000; /* Vysoce nad ostatními prvky */
-        padding: 0; /* Odstraníme padding */
-        margin: 0; /* Odstraníme margin */
+        margin: 0 !important; /* Odstraníme margin */
+        padding: 0 !important; /* Odstraníme padding */
     }
     #output audio, #output video, #output iframe {
         height: 600px; /* Zvětšená výška pro 16:9 poměr */
