@@ -73,7 +73,7 @@ html {
     display: block;
 }
 
-/* Desktop – zúžené video pod mikrofonem, omezená šířka */
+/* Desktop – ještě více zúžené video pod mikrofonem, omezená šířka */
 @media (min-width: 769px) {
     .mic-icon {
         width: 350px;
@@ -84,13 +84,13 @@ html {
     }
     #output {
         position: relative; /* Vrátíme video do .bottom-half */
-        width: 800px !important; /* Zúžená šířka videa (můžeme upravit podle potřeby) */
+        width: 600px !important; /* Další zúžení šířky videa (můžeme upravit podle potřeby) */
         margin: 0 auto !important; /* Centrování videa v rámci stránky */
         padding: 0 !important; /* Odstraníme padding */
     }
     #output audio, #output video, #output iframe {
         height: 600px; /* Zachováme výšku pro 16:9 poměr */
-        width: 800px !important; /* Zúžená šířka videa (můžeme upravit) */
+        width: 600px !important; /* Další zúžení šířky videa (můžeme upravit) */
         max-width: none !important; /* Odstraníme případné omezení */
         object-fit: contain; /* Zachování proporce bez deformace */
         margin: 0 !important; /* Odstraníme margin */
