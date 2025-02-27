@@ -52,7 +52,7 @@ html {
     font-size: 20px; /* Trochu zvětšíme text pro lepší čitelnost */
     color: #333;
     text-align: center;
-    margin-top: 40px !important; /* Větší mezera mezi mikrofonem a videem (můžeme upravit) */
+    margin-top: 20px !important; /* Přiblížení videa k mikrofonu (můžeme upravit) */
     max-width: none !important; /* Odstraníme omezení šířky */
     width: 100%; /* Plná šířka kontejneru */
     box-sizing: border-box; /* Zajistíme správné výpočty */
@@ -73,7 +73,7 @@ html {
     display: block;
 }
 
-/* Desktop – zúžené video pod mikrofonem, správný poměr stran, minimalizace černých pruhů */
+/* Desktop – zvětšené video pod mikrofonem, správný poměr stran, minimální mezera */
 @media (min-width: 769px) {
     .mic-icon {
         width: 250px; /* Zachováme zmenšení mikrofonu */
@@ -84,13 +84,13 @@ html {
     }
     #output {
         position: relative; /* Vrátíme video do .bottom-half */
-        width: 400px !important; /* Zachováme šířku videa */
+        width: 533px !important; /* Zvětšení videa o třetinu (400px × 1.333 ≈ 533px) */
         margin: 0 auto !important; /* Centrování videa v rámci stránky */
         padding: 0 !important; /* Odstraníme padding */
     }
     #output audio, #output video, #output iframe {
-        height: 225px !important; /* Zachováme výšku pro poměr 16:9 s šířkou 400px */
-        width: 400px !important; /* Zachováme šířku videa */
+        height: 300px !important; /* Nová výška pro poměr 16:9 s šířkou 533px (533 ÷ 16 × 9 = 300) */
+        width: 533px !important; /* Zvětšení šířky videa */
         max-width: none !important; /* Odstraníme případné omezení */
         object-fit: cover; /* Roztažení videa na plnou šířku a výšku, minimalizace černých pruhů (může oříznout okraje) */
         margin: 0 !important; /* Odstraníme margin */
