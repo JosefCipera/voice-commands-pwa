@@ -1,243 +1,121 @@
-<!DOCTYPE html>
-<html lang="cs">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chytré já</title>
-  <link rel="manifest" href="/voice-commands-pwa/manifest.json">
-  <link rel="stylesheet" href="style.css">
-  <link rel="icon" type="image/png" href="/voice-commands-pwa/microphone-512.png">
-</head>
-<body>
-  <div class="container">
-    <div class="top-half">
-      <img src="/voice-commands-pwa/microphone-512.png" alt="Microphone" id="start-speech" class="mic-icon">
-    </div>
-    <div class="bottom-half">
-      <div id="output">Řekněte příkaz, např. 'Zobraz vytížení', 'Přehrát video školení', nebo 'Spusť audio návod'.</div>
-    </div>
-  </div>
+body {
+    margin: 0;
+    height: 100vh;
+    display: block; /* Změníme na block, abychom odstranili flex omezení */
+    background-color: #f0f0f0;
+    font-family: Arial, sans-serif;
+    overflow-x: hidden; /* Zabrání horizontálnímu scrollování */
+    box-sizing: border-box; /* Zajistíme správné výpočty šířky/výšky */
+}
 
-  <script>
-    if (!('SpeechRecognition' in window) && !('webkitSpeechRecognition' in window)) {
-      console.error('❌ Hlasové rozpoznávání není podporováno.');
-      alert('Hlasové rozpoznávání není podporováno. Zkuste to v Chrome nebo na jiném zařízení.');
-      document.getElementById('start-speech').disabled = true;
-      throw new Error('SpeechRecognition not supported');
+html {
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden; /* Zabrání horizontálnímu scrollování */
+}
+
+.container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    position: relative; /* Pro umístění videa v rámci kontejneru */
+    max-width: none !important; /* Odstraníme případné omezení šířky */
+    box-sizing: border-box; /* Zajistíme správné výpočty */
+}
+
+.top-half, .bottom-half {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    max-width: none !important; /* Odstraníme případné omezení */
+    box-sizing: border-box; /* Zajistíme správné výpočty */
+}
+
+.mic-icon {
+    width: 350px; /* Pevná šířka pro desktop */
+    height: auto; /* Zachování poměru */
+    cursor: pointer;
+    transition: opacity 0.3s; /* Změníme na opacity pro lepší efekt */
+    background: #ffffff; /* Bílé pozadí pro lepší kontrast na desktopu */
+    border-radius: 10px; /* Lehké zaokrouhlení pro estetiku */
+    padding: 5px; /* Levé okraje pro průhlednou ikonu */
+    box-sizing: border-box; /* Zajistíme správné výpočty */
+}
+
+.mic-icon.recording {
+    opacity: 0.7; /* Změníme průhlednost během nahrávání */
+}
+
+#output {
+    font-size: 18px;
+    color: #333;
+    text-align: center;
+    margin-top: 0px; /* Blízkost k mikrofonu */
+    max-width: none !important; /* Odstraníme omezení šířky */
+    width: 100%; /* Plná šířka kontejneru */
+    box-sizing: border-box; /* Zajistíme správné výpočty */
+}
+
+/* Styly pro stavové zprávy */
+.status {
+    font-size: 24px;
+    color: #4444ff; /* Modrá barva pro stav */
+    font-weight: normal; /* Neboldované */
+    display: block;
+    margin-bottom: 10px;
+}
+
+.hint {
+    font-size: 18px;
+    color: #333; /* Černá barva pro nápovědu */
+    display: block;
+}
+
+/* Desktop – ještě více zúžené video pod mikrofonem, omezená šířka */
+@media (min-width: 769px) {
+    .mic-icon {
+        width: 350px;
     }
-
-    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-    recognition.lang = 'cs-CZ';
-    recognition.interimResults = false;
-    recognition.continuous = false;
-
-    recognition.onerror = (event) => {
-      console.error('❌ Chyba při hlasovém rozpoznávání:', event.error);
-      alert(`Chyba při rozpoznávání hlasu: ${event.error}. Zkontrolujte povolení mikrofonu.`);
-      document.getElementById('start-speech').classList.remove('recording');
-    };
-
-    recognition.onend = () => {
-      console.log('🔇 Hlasové rozpoznávání ukončeno.');
-      document.getElementById('start-speech').classList.remove('recording');
-    };
-
-    document.getElementById('start-speech').addEventListener('click', () => {
-      recognition.start();
-      console.log('🎤 Hlasové rozpoznávání spuštěno...');
-      document.getElementById('start-speech').classList.add('recording');
-
-      // Automatické zastavení po 10 sekundách
-      setTimeout(() => {
-        if (recognition) {
-          recognition.stop();
-          console.log('🔇 Hlasové rozpoznávání automaticky ukončeno po 10 sekundách.');
-          document.getElementById('start-speech').classList.remove('recording');
-        }
-      }, 10000);
-    });
-
-    recognition.onresult = (event) => {
-      const command = event.results[0][0].transcript.trim().toLowerCase();
-      console.log(`🎙️ Rozpoznaný příkaz: ${command}`);
-      document.getElementById('output').innerText = `Rozpoznáno: ${command}`;
-      recognition.stop();
-      handleCommand(command);
-    };
-
-    async function handleCommand(command) {
-      const words = command.split(' ').length;
-      if (words > 10) {
-        console.warn('⚠️ Příkaz je příliš dlouhý.');
-        document.getElementById('output').innerHTML = '<span class="status">Soubor nenalezen</span><br><span class="hint">Řekněte příkaz, např. "Zobraz vytížení", "Přehrát video školení", nebo "Spusť audio návod".</span>';
-        return;
-      }
-
-      const lowerCommand = command.toLowerCase();
-      console.log(`Rozpoznaný příkaz: ${lowerCommand}`);
-
-      const webhookUrl = "https://hook.eu1.make.com/ns3n8fk70iwoex1kme9af5j6ghh3351x"; // Tvoje webhook URL v Make.com
-
-      try {
-        const response = await fetch(webhookUrl, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ Povel: lowerCommand }) // Odesíláme celý příkaz v malých písmeních
-        });
-
-        console.log("📡 HTTP status:", response.status);
-
-        const text = await response.text();
-        try {
-          const result = JSON.parse(text);
-          console.log("📡 Odpověď z Make:", result);
-
-          if (result.url) {
-            console.log("➡️ Zpracovávám URL:", result.url);
-            displayContent(result.url);
-          } else {
-            console.error("❌ URL nebyla v odpovědi nalezena.");
-            document.getElementById('output').innerHTML = '<span class="status">Soubor nenalezen</span><br><span class="hint">Řekněte příkaz, např. "Zobraz vytížení", "Přehrát video školení", nebo "Spusť audio návod".</span>';
-          }
-        } catch (error) {
-          console.error("❌ Chyba při parsování JSON odpovědi:", text);
-          document.getElementById('output').innerHTML = '<span class="status">Technická chyba</span><br><span class="hint">Zkontrolujte připojení a zkuste znovu, např. "Zobraz vytížení", "Přehrát video školení", nebo "Spusť audio návod".</span>';
-        }
-
-      } catch (error) {
-        console.error("❌ Chyba při komunikaci s Make:", error);
-        document.getElementById('output').innerHTML = '<span class="status">Připojení selhalo</span><br><span class="hint">Zkontrolujte internet a zkuste znovu, např. "Zobraz vytížení", "Přehrát video školení", nebo "Spusť audio návod".</span>';
-      }
+    .container, .bottom-half {
+        max-width: none !important; /* Odstraníme případné omezení */
+        width: 100%; /* Plná šířka kontejneru */
     }
-
-    function displayContent(url) {
-      const output = document.getElementById('output');
-      output.innerText = `Načítám obsah: ${url}`;
-
-      // Zkontrolujeme, zda je URL platná
-      if (!url || typeof url !== 'string') {
-        output.innerHTML = '<span class="status">Soubor nenalezen</span><br><span class="hint">Řekněte příkaz, např. "Zobraz vytížení", "Přehrát video školení", nebo "Spusť audio návod".</span>';
-        return;
-      }
-
-      // Rozpoznání typu URL a zobrazení v frame nebo chybová hláška
-      if (url.includes('.mp3') || url.includes('.wav') || url.includes('podcasty.seznam.cz')) {
-        const audio = document.createElement('audio');
-        audio.controls = true;
-        audio.src = url;
-        audio.onerror = () => {
-          output.innerHTML = '<span class="status">Soubor nenalezen</span><br><span class="hint">Řekněte příkaz, např. "Zobraz vytížení", "Přehrát video školení", nebo "Spusť audio návod".</span>';
-        };
-        audio.onloadedmetadata = () => {
-          output.innerHTML = '';
-          output.appendChild(audio);
-          if (window.innerWidth <= 768) {
-            const requestFullscreen = audio.requestFullscreen || audio.webkitRequestFullscreen || audio.msRequestFullscreen;
-            if (requestFullscreen) {
-              requestFullscreen.call(audio).catch(error => {
-                console.error('❌ Nelze spustit fullscreen pro audio:', error);
-                output.innerHTML = '<span class="status">Soubor nenalezen</span><br><span class="hint">Řekněte příkaz, např. "Zobraz vytížení", "Přehrát video školení", nebo "Spusť audio návod".</span>';
-              });
-            }
-          }
-        };
-        output.innerHTML = ''; // Vyčistíme před přidáním audia
-      } else if (url.includes('youtube.com') || url.includes('vimeo.com') || url.includes('.mp4') || url.includes('.webm')) {
-        let mediaElement;
-        if (url.includes('youtube.com')) {
-          const youtubeId = new URL(url).searchParams.get('v') || url.split('v=')[1]?.split('&')[0];
-          if (youtubeId) {
-            mediaElement = document.createElement('iframe');
-            mediaElement.width = window.innerWidth > 768 ? '600' : '100%'; // 600px na desktopu, 100% na mobilu
-            mediaElement.height = window.innerWidth > 768 ? '600' : '100%'; // 600px na desktopu, plná výška na mobilu
-            mediaElement.style.width = '600px !important'; // Přidáme inline style pro prioritu
-            mediaElement.style.height = '600px !important'; // Přidáme inline style pro prioritu
-            mediaElement.style.objectFit = 'contain'; // Zachování proporce
-            mediaElement.src = `https://www.youtube.com/embed/${youtubeId}?autoplay=1&enablejsapi=1`; // Přidáme enablejsapi pro kontrolu přes API
-            mediaElement.allow = 'autoplay; encrypted-media; fullscreen';
-            mediaElement.allowFullscreen = true;
-            // Pokus o nastavení velikosti přes YouTube API
-            mediaElement.onload = () => {
-              if (window.YT && window.YT.Player) {
-                new window.YT.Player(mediaElement, {
-                  events: {
-                    'onReady': function(event) {
-                      event.target.setSize(600, 600); // Explicitní nastavení velikosti
-                    }
-                  }
-                });
-              }
-            };
-          }
-        } else if (url.includes('vimeo.com')) {
-          const vimeoId = url.split('/').pop();
-          if (vimeoId) {
-            mediaElement = document.createElement('iframe');
-            mediaElement.width = window.innerWidth > 768 ? '600' : '100%'; // 600px na desktopu, 100% na mobilu
-            mediaElement.height = window.innerWidth > 768 ? '600' : '100%'; // 600px na desktopu, plná výška na mobilu
-            mediaElement.style.width = '600px !important'; // Přidáme inline style pro prioritu
-            mediaElement.style.height = '600px !important'; // Přidáme inline style pro prioritu
-            mediaElement.style.objectFit = 'contain'; // Zachování proporce
-            mediaElement.src = `https://player.vimeo.com/video/${vimeoId}?autoplay=1`; // Přidáme autoplay
-            mediaElement.allow = 'autoplay; encrypted-media; fullscreen';
-            mediaElement.allowFullscreen = true;
-          }
-        } else {
-          mediaElement = document.createElement('video');
-          mediaElement.controls = true;
-          mediaElement.width = window.innerWidth > 768 ? 600 : '100%'; // 600px (16:9 pro 600px výšku) na desktopu, 100% na mobilu
-          mediaElement.height = window.innerWidth > 768 ? 600 : '100%'; // 600px na desktopu, plná výška na mobilu
-          mediaElement.style.width = '600px !important'; // Přidáme inline style pro prioritu
-          mediaElement.style.height = '600px !important'; // Přidáme inline style pro prioritu
-          mediaElement.style.objectFit = 'contain'; // Zachování proporce
-          mediaElement.src = url;
-          mediaElement.autoplay = true; // Přidáme autoplay pro okamžité přehrávání
-        }
-        if (mediaElement) {
-          mediaElement.onerror = () => {
-            output.innerHTML = '<span class="status">Soubor nenalezen</span><br><span class="hint">Řekněte příkaz, např. "Zobraz vytížení", "Přehrát video školení", nebo "Spusť audio návod".</span>';
-          };
-          output.innerHTML = '';
-          output.appendChild(mediaElement);
-
-          // Automatické přepnutí do fullscreen režimu na mobilu
-          if (window.innerWidth <= 768 && (mediaElement instanceof HTMLIFrameElement || mediaElement instanceof HTMLVideoElement)) {
-            const requestFullscreen = mediaElement.requestFullscreen || mediaElement.webkitRequestFullscreen || mediaElement.msRequestFullscreen;
-            if (requestFullscreen) {
-              requestFullscreen.call(mediaElement).catch(error => {
-                console.error('❌ Nelze spustit fullscreen:', error);
-                // Fallback: Pokusíme se nastavit maximální velikost, pokud fullscreen selže
-                mediaElement.width = '100%';
-                mediaElement.height = '100%';
-                output.innerHTML = '<span class="status">Soubor nenalezen</span><br><span class="hint">Řekněte příkaz, např. "Zobraz vytížení", "Přehrát video školení", nebo "Spusť audio návod".</span>';
-              });
-            } else {
-              // Fallback bez fullscreenu
-              mediaElement.width = '100%';
-              mediaElement.height = '100%';
-            }
-          }
-        } else {
-          output.innerHTML = '<span class="status">Soubor nenalezen</span><br><span class="hint">Řekněte příkaz, např. "Zobraz vytížení", "Přehrát video školení", nebo "Spusť audio návod".</span>';
-        }
-      } else if (url.includes('.pdf') || url.includes('.xls') || url.includes('.xlsx') || url.includes('.ppt') || url.includes('.pptx') || url.includes('.doc') || url.includes('.docx')) {
-        const iframe = document.createElement('iframe');
-        iframe.width = '100%';
-        iframe.height = '500px'; // Standardní výška pro dokumenty
-        iframe.src = `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`;
-        iframe.onerror = () => {
-          output.innerHTML = '<span class="status">Soubor nenalezen</span><br><span class="hint">Řekněte příkaz, např. "Zobraz vytížení", "Přehrát video školení", nebo "Spusť audio návod".</span>';
-        };
-        output.innerHTML = '';
-        output.appendChild(iframe);
-      } else if (url.includes('app.tabidoo.cloud/public-dashboard') || url.includes('public') || url.includes('dashboard')) {
-        // Otevření veřejných dashboardů na samostatné stránce
-        window.location.href = url;
-      } else {
-        // Ostatní URL (stránky, grafy) otevřeme na samostatné stránce
-        window.location.href = url;
-      }
+    #output {
+        position: relative; /* Vrátíme video do .bottom-half */
+        width: 500px !important; /* Další zúžení šířky videa (můžeme upravit podle potřeby) */
+        margin: 0 auto !important; /* Centrování videa v rámci stránky */
+        padding: 0 !important; /* Odstraníme padding */
     }
-  </script>
-</body>
-</html>
+    #output audio, #output video, #output iframe {
+        height: 600px; /* Zachováme výšku pro 16:9 poměr */
+        width: 500px !important; /* Další zúžení šířky videa (můžeme upravit) */
+        max-width: none !important; /* Odstraníme případné omezení */
+        object-fit: contain; /* Zachování proporce bez deformace */
+        margin: 0 !important; /* Odstraníme margin */
+        padding: 0 !important; /* Odstraníme padding */
+        border: none !important; /* Odstraníme okraje */
+    }
+}
+
+/* Mobil – video na maximální obrazovce */
+@media (max-width: 768px) {
+    .mic-icon {
+        width: 50vw; /* Polovina šířky mobilu */
+        max-width: none; /* Žádné omezení na mobilu */
+        background: transparent; /* Bez pozadí na mobilu, aby kontrastoval s modrou plochou */
+        border: 2px solid #4444ff; /* Modrý okraj pro lepší viditelnost na mobilu */
+        box-sizing: border-box; /* Zajistíme správné výpočty */
+    }
+    .bottom-half {
+        align-items: flex-start; /* Posuneme obsah (.bottom-half) nahoru na mobilu */
+        padding-top: 80px; /* Zůstáváme u 80px pro posun nahoru */
+    }
+    #output audio, #output video, #output iframe {
+        height: 400px; /* Původní výška pro mobil */
+        max-width: 100%; /* Normální šířka na mobilu */
+        object-fit: contain; /* Zachování proporce */
+        box-sizing: border-box; /* Zajistíme správné výpočty */
+    }
+}
