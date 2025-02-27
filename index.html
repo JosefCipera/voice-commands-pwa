@@ -148,19 +148,37 @@
           const youtubeId = new URL(url).searchParams.get('v') || url.split('v=')[1]?.split('&')[0];
           if (youtubeId) {
             mediaElement = document.createElement('iframe');
-            mediaElement.width = window.innerWidth > 768 ? '100vw' : '100%'; // Plná šířka na desktopu, 100% na mobilu
-            mediaElement.height = window.innerWidth > 768 ? '600px' : '100%'; // 600px na desktopu, plná výška na mobilu
-            mediaElement.src = `https://www.youtube.com/embed/${youtubeId}`;
+            mediaElement.width = window.innerWidth > 768 ? '1920' : '100%'; // 1920px na desktopu, 100% na mobilu
+            mediaElement.height = window.innerWidth > 768 ? '600' : '100%'; // 600px na desktopu, plná výška na mobilu
+            mediaElement.style.width = '100vw !important'; // Přidáme inline style pro prioritu
+            mediaElement.style.height = '600px !important'; // Přidáme inline style pro prioritu
+            mediaElement.style.objectFit = 'contain'; // Zachování proporce
+            mediaElement.src = `https://www.youtube.com/embed/${youtubeId}?autoplay=1&enablejsapi=1`; // Přidáme enablejsapi pro kontrolu přes API
             mediaElement.allow = 'autoplay; encrypted-media; fullscreen';
             mediaElement.allowFullscreen = true;
+            // Pokus o nastavení velikosti přes YouTube API
+            mediaElement.onload = () => {
+              if (window.YT && window.YT.Player) {
+                new window.YT.Player(mediaElement, {
+                  events: {
+                    'onReady': function(event) {
+                      event.target.setSize(1920, 600); // Explicitní nastavení velikosti
+                    }
+                  }
+                });
+              }
+            };
           }
         } else if (url.includes('vimeo.com')) {
           const vimeoId = url.split('/').pop();
           if (vimeoId) {
             mediaElement = document.createElement('iframe');
-            mediaElement.width = window.innerWidth > 768 ? '100vw' : '100%'; // Plná šířka na desktopu, 100% na mobilu
-            mediaElement.height = window.innerWidth > 768 ? '600px' : '100%'; // 600px na desktopu, plná výška na mobilu
-            mediaElement.src = `https://player.vimeo.com/video/${vimeoId}`;
+            mediaElement.width = window.innerWidth > 768 ? '1920' : '100%'; // 1920px na desktopu, 100% na mobilu
+            mediaElement.height = window.innerWidth > 768 ? '600' : '100%'; // 600px na desktopu, plná výška na mobilu
+            mediaElement.style.width = '100vw !important'; // Přidáme inline style pro prioritu
+            mediaElement.style.height = '600px !important'; // Přidáme inline style pro prioritu
+            mediaElement.style.objectFit = 'contain'; // Zachování proporce
+            mediaElement.src = `https://player.vimeo.com/video/${vimeoId}?autoplay=1`; // Přidáme autoplay
             mediaElement.allow = 'autoplay; encrypted-media; fullscreen';
             mediaElement.allowFullscreen = true;
           }
@@ -169,7 +187,11 @@
           mediaElement.controls = true;
           mediaElement.width = window.innerWidth > 768 ? 1920 : '100%'; // 1920px (16:9 pro 600px výšku) na desktopu, 100% na mobilu
           mediaElement.height = window.innerWidth > 768 ? 600 : '100%'; // 600px na desktopu, plná výška na mobilu
+          mediaElement.style.width = '100vw !important'; // Přidáme inline style pro prioritu
+          mediaElement.style.height = '600px !important'; // Přidáme inline style pro prioritu
+          mediaElement.style.objectFit = 'contain'; // Zachování proporce
           mediaElement.src = url;
+          mediaElement.autoplay = true; // Přidáme autoplay pro okamžité přehrávání
         }
         if (mediaElement) {
           mediaElement.onerror = () => {
@@ -184,8 +206,15 @@
             if (requestFullscreen) {
               requestFullscreen.call(mediaElement).catch(error => {
                 console.error('❌ Nelze spustit fullscreen:', error);
+                // Fallback: Pokusíme se nastavit maximální velikost, pokud fullscreen selže
+                mediaElement.width = '100%';
+                mediaElement.height = '100%';
                 output.innerHTML = '<span class="status">Soubor nenalezen</span><br><span class="hint">Řekněte příkaz, např. "Zobraz vytížení", "Přehrát video školení", nebo "Spusť audio návod".</span>';
               });
+            } else {
+              // Fallback bez fullscreenu
+              mediaElement.width = '100%';
+              mediaElement.height = '100%';
             }
           }
         } else {
