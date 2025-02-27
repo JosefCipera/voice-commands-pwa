@@ -32,13 +32,14 @@ body {
     padding: 5px; /* Levé okraje pro průhlednou ikonu */
     position: relative !important; /* Zajištění absolutní pozice s prioritou */
     z-index: 0; /* Základní z-index pro mikrofon */
+    overflow: hidden; /* Zajistíme, že vlny nebudou přetékat mimo mikrofon */
 }
 
 .mic-icon.recording {
     opacity: 0.7; /* Změníme průhlednost během nahrávání */
 }
 
-/* Opravená animace vysílacích vln – maximální priorita a pozice */
+/* Opravená animace vysílacích vln – maximální priorita, fix proporce */
 @keyframes pulse {
     0% {
         transform: scale(0.1);
@@ -55,7 +56,7 @@ body {
     position: absolute !important;
     width: 100% !important;
     height: 100% !important;
-    border-radius: 50% !important;
+    border-radius: 50% !important; /* Zajistíme kruh, ne čtverec */
     background: rgba(68, 68, 255, 0.3) !important; /* Poloprůhledná modrá barva jako vlny */
     animation: pulse 2s infinite ease-out !important;
     pointer-events: none; /* Aby animace nebránila klikání */
@@ -65,14 +66,16 @@ body {
     box-shadow: 0 0 0 0 rgba(68, 68, 255, 0.3); /* Fallback pro starší prohlížeče */
 }
 
-/* Mobilní úprava animace a ikony */
+/* Mobilní úprava animace, ikony a proporce */
 @media (max-width: 768px) {
     .mic-icon {
         width: 50vw; /* Polovina šířky mobilu */
+        height: 50vw; /* Rovná výška pro kruhový tvar */
         max-width: none; /* Žádné omezení na mobilu */
         background: transparent !important; /* Bez pozadí na mobilu, aby kontrastoval s modrou plochou */
-        border: 2px solid #4444ff; /* Modrý okraj pro lepší viditelnost na mobilu */
+        border: none !important; /* Odstraníme modrý okraj, aby nekonfliktoval s vlnami */
         position: relative !important; /* Pro absolutní pozici ::after */
+        border-radius: 10px; /* Zachováme zaokrouhlení pro estetiku */
     }
     .mic-icon.recording::after {
         background: rgba(68, 68, 255, 0.3) !important; /* Stejná barva na mobilu */
@@ -92,6 +95,7 @@ body {
 @media (min-width: 769px) {
     .mic-icon {
         width: 350px;
+        height: 350px; /* Rovná výška pro konzistentní kruh */
     }
     #output audio, #output video, #output iframe {
         height: 267.75px; /* Zmenšení o 15 % (315px × 0.85) */
@@ -105,7 +109,7 @@ body {
     font-size: 18px;
     color: #333;
     text-align: center;
-    margin-top: 0px; /* Snížíme margin-top z 10px na 0px pro posun textu dalších dva řádky výše */
+    margin-top: 0px; /* Zachováváme 0px pro blízkost k mikrofonu */
     max-width: 90%;
     width: auto; /* Umožníme širší obsah */
 }
