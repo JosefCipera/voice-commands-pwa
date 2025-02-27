@@ -5,6 +5,13 @@ body {
     background-color: #f0f0f0;
     font-family: Arial, sans-serif;
     overflow-x: hidden; /* Zabrání horizontálnímu scrollování */
+    box-sizing: border-box; /* Zajistíme správné výpočty šířky/výšky */
+}
+
+html {
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden; /* Zabrání horizontálnímu scrollování */
 }
 
 .container {
@@ -14,6 +21,7 @@ body {
     flex-direction: column;
     position: relative; /* Pro umístění videa mimo kontejner */
     max-width: none !important; /* Odstraníme případné omezení šířky */
+    box-sizing: border-box; /* Zajistíme správné výpočty */
 }
 
 .top-half, .bottom-half {
@@ -22,6 +30,7 @@ body {
     justify-content: center;
     align-items: center;
     max-width: none !important; /* Odstraníme případné omezení */
+    box-sizing: border-box; /* Zajistíme správné výpočty */
 }
 
 .mic-icon {
@@ -32,6 +41,7 @@ body {
     background: #ffffff; /* Bílé pozadí pro lepší kontrast na desktopu */
     border-radius: 10px; /* Lehké zaokrouhlení pro estetiku */
     padding: 5px; /* Levé okraje pro průhlednou ikonu */
+    box-sizing: border-box; /* Zajistíme správné výpočty */
 }
 
 .mic-icon.recording {
@@ -45,6 +55,7 @@ body {
     margin-top: 0px; /* Blízkost k mikrofonu */
     max-width: none !important; /* Odstraníme omezení šířky */
     width: auto; /* Umožníme plnou šířku */
+    box-sizing: border-box; /* Zajistíme správné výpočty */
 }
 
 /* Styly pro stavové zprávy */
@@ -78,12 +89,17 @@ body {
         width: 100vw !important; /* Plná šířka viewportu s prioritou */
         transform: translateY(-50%); /* Vycentrování vertikálně */
         z-index: 1000; /* Vysoce nad ostatními prvky */
+        padding: 0; /* Odstraníme padding */
+        margin: 0; /* Odstraníme margin */
     }
     #output audio, #output video, #output iframe {
         height: 600px; /* Zvětšená výška pro 16:9 poměr */
         width: 100vw !important; /* Plná šířka viewportu s prioritou */
         max-width: none !important; /* Odstraníme případné omezení */
         object-fit: contain; /* Zachování proporce bez deformace */
+        margin: 0 !important; /* Odstraníme margin */
+        padding: 0 !important; /* Odstraníme padding */
+        border: none !important; /* Odstraníme okraje */
     }
 }
 
@@ -94,6 +110,7 @@ body {
         max-width: none; /* Žádné omezení na mobilu */
         background: transparent; /* Bez pozadí na mobilu, aby kontrastoval s modrou plochou */
         border: 2px solid #4444ff; /* Modrý okraj pro lepší viditelnost na mobilu */
+        box-sizing: border-box; /* Zajistíme správné výpočty */
     }
     .bottom-half {
         align-items: flex-start; /* Posuneme obsah (.bottom-half) nahoru na mobilu */
@@ -103,5 +120,6 @@ body {
         height: 400px; /* Původní výška pro mobil */
         max-width: 100%; /* Normální šířka na mobilu */
         object-fit: contain; /* Zachování proporce */
+        box-sizing: border-box; /* Zajistíme správné výpočty */
     }
 }
