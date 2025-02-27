@@ -116,4 +116,128 @@
 
       // Zkontrolujeme, zda je URL platná
       if (!url || typeof url !== 'string') {
-        output.innerHTML = '<span class="status">Soubor nenalezen</span><br><span class
+        output.innerHTML = '<span class="status">Soubor nenalezen</span><br><span class="hint">Řekněte příkaz, např. "Zobraz vytížení", "Přehrát video školení", nebo "Spusť audio návod".</span>';
+        return;
+      }
+
+      // Rozpoznání typu URL a zobrazení v frame nebo chybová hláška
+      if (url.includes('.mp3') || url.includes('.wav') || url.includes('podcasty.seznam.cz')) {
+        const audio = document.createElement('audio');
+        audio.controls = true;
+        audio.src = url;
+        audio.onerror = () => {
+          output.innerHTML = '<span class="status">Soubor nenalezen</span><br><span class="hint">Řekněte příkaz, např. "Zobraz vytížení", "Přehrát video školení", nebo "Spusť audio návod".</span>';
+        };
+        audio.onloadedmetadata = () => {
+          output.innerHTML = '';
+          output.appendChild(audio);
+          if (window.innerWidth <= 768) {
+            const requestFullscreen = audio.requestFullscreen || audio.webkitRequestFullscreen || audio.msRequestFullscreen;
+            if (requestFullscreen) {
+              requestFullscreen.call(audio).catch(error => {
+                console.error('❌ Nelze spustit fullscreen pro audio:', error);
+                output.innerHTML = '<span class="status">Soubor nenalezen</span><br><span class="hint">Řekněte příkaz, např. "Zobraz vytížení", "Přehrát video školení", nebo "Spusť audio návod".</span>';
+              });
+            }
+          }
+        };
+        output.innerHTML = ''; // Vyčistíme před přidáním audia
+      } else if (url.includes('youtube.com') || url.includes('vimeo.com') || url.includes('.mp4') || url.includes('.webm')) {
+        let mediaElement;
+        if (url.includes('youtube.com')) {
+          const youtubeId = new URL(url).searchParams.get('v') || url.split('v=')[1]?.split('&')[0];
+          if (youtubeId) {
+            mediaElement = document.createElement('iframe');
+            mediaElement.width = window.innerWidth > 768 ? '533' : '100%'; // Zvětšení na 533px na desktopu, 100% na mobilu
+            mediaElement.height = window.innerWidth > 768 ? '300' : '100%'; // Nová výška 300px pro poměr 16:9 na desktopu, plná výška na mobilu
+            mediaElement.style.width = '533px !important'; // Přidáme inline style pro prioritu
+            mediaElement.style.height = '300px !important'; // Přidáme inline style pro prioritu
+            mediaElement.style.objectFit = 'cover'; // Roztažení videa na plnou šířku a výšku, minimalizace černých pruhů (může oříznout okraje)
+            mediaElement.src = `https://www.youtube.com/embed/${youtubeId}?autoplay=1&enablejsapi=1`; // Přidáme enablejsapi pro kontrolu přes API
+            mediaElement.allow = 'autoplay; encrypted-media; fullscreen';
+            mediaElement.allowFullscreen = true;
+            // Pokus o nastavení velikosti přes YouTube API
+            mediaElement.onload = () => {
+              if (window.YT && window.YT.Player) {
+                new window.YT.Player(mediaElement, {
+                  events: {
+                    'onReady': function(event) {
+                      event.target.setSize(533, 300); // Explicitní nastavení velikosti
+                    }
+                  }
+                });
+              }
+            };
+          }
+        } else if (url.includes('vimeo.com')) {
+          const vimeoId = url.split('/').pop();
+          if (vimeoId) {
+            mediaElement = document.createElement('iframe');
+            mediaElement.width = window.innerWidth > 768 ? '533' : '100%'; // Zvětšení na 533px na desktopu, 100% na mobilu
+            mediaElement.height = window.innerWidth > 768 ? '300' : '100%'; // Nová výška 300px pro poměr 16:9 na desktopu, plná výška na mobilu
+            mediaElement.style.width = '533px !important'; // Přidáme inline style pro prioritu
+            mediaElement.style.height = '300px !important'; // Přidáme inline style pro prioritu
+            mediaElement.style.objectFit = 'cover'; // Roztažení videa na plnou šířku a výšku, minimalizace černých pruhů (může oříznout okraje)
+            mediaElement.src = `https://player.vimeo.com/video/${vimeoId}?autoplay=1`; // Přidáme autoplay
+            mediaElement.allow = 'autoplay; encrypted-media; fullscreen';
+            mediaElement.allowFullscreen = true;
+          }
+        } else {
+          mediaElement = document.createElement('video');
+          mediaElement.controls = true;
+          mediaElement.width = window.innerWidth > 768 ? 533 : '100%'; // Zvětšení na 533px (16:9 pro 300px výšku) na desktopu, 100% na mobilu
+          mediaElement.height = window.innerWidth > 768 ? 300 : '100%'; // Nová výška 300px pro poměr 16:9 na desktopu, plná výška na mobilu
+          mediaElement.style.width = '533px !important'; // Přidáme inline style pro prioritu
+          mediaElement.style.height = '300px !important'; // Přidáme inline style pro prioritu
+          mediaElement.style.objectFit = 'cover'; // Roztažení videa na plnou šířku a výšku, minimalizace černých pruhů (může oříznout okraje)
+          mediaElement.src = url;
+          mediaElement.autoplay = true; // Přidáme autoplay pro okamžité přehrávání
+        }
+        if (mediaElement) {
+          mediaElement.onerror = () => {
+            output.innerHTML = '<span class="status">Soubor nenalezen</span><br><span class="hint">Řekněte příkaz, např. "Zobraz vytížení", "Přehrát video školení", nebo "Spusť audio návod".</span>';
+          };
+          output.innerHTML = '';
+          output.appendChild(mediaElement);
+
+          // Automatické přepnutí do fullscreen režimu na mobilu
+          if (window.innerWidth <= 768 && (mediaElement instanceof HTMLIFrameElement || mediaElement instanceof HTMLVideoElement)) {
+            const requestFullscreen = mediaElement.requestFullscreen || mediaElement.webkitRequestFullscreen || mediaElement.msRequestFullscreen;
+            if (requestFullscreen) {
+              requestFullscreen.call(mediaElement).catch(error => {
+                console.error('❌ Nelze spustit fullscreen:', error);
+                // Fallback: Pokusíme se nastavit maximální velikost, pokud fullscreen selže
+                mediaElement.width = '100%';
+                mediaElement.height = '100%';
+                output.innerHTML = '<span class="status">Soubor nenalezen</span><br><span class="hint">Řekněte příkaz, např. "Zobraz vytížení", "Přehrát video školení", nebo "Spusť audio návod".</span>';
+              });
+            } else {
+              // Fallback bez fullscreenu
+              mediaElement.width = '100%';
+              mediaElement.height = '100%';
+            }
+          }
+        } else {
+          output.innerHTML = '<span class="status">Soubor nenalezen</span><br><span class="hint">Řekněte příkaz, např. "Zobraz vytížení", "Přehrát video školení", nebo "Spusť audio návod".</span>';
+        }
+      } else if (url.includes('.pdf') || url.includes('.xls') || url.includes('.xlsx') || url.includes('.ppt') || url.includes('.pptx') || url.includes('.doc') || url.includes('.docx')) {
+        const iframe = document.createElement('iframe');
+        iframe.width = '100%';
+        iframe.height = '500px'; // Standardní výška pro dokumenty
+        iframe.src = `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`;
+        iframe.onerror = () => {
+          output.innerHTML = '<span class="status">Soubor nenalezen</span><br><span class="hint">Řekněte příkaz, např. "Zobraz vytížení", "Přehrát video školení", nebo "Spusť audio návod".</span>';
+        };
+        output.innerHTML = '';
+        output.appendChild(iframe);
+      } else if (url.includes('app.tabidoo.cloud/public-dashboard') || url.includes('public') || url.includes('dashboard')) {
+        // Otevření veřejných dashboardů na samostatné stránce
+        window.location.href = url;
+      } else {
+        // Ostatní URL (stránky, grafy) otevřeme na samostatné stránce
+        window.location.href = url;
+      }
+    }
+  </script>
+</body>
+</html>
