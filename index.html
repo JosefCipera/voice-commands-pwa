@@ -131,6 +131,15 @@
         audio.onloadedmetadata = () => {
           output.innerHTML = '';
           output.appendChild(audio);
+          if (window.innerWidth <= 768) {
+            const requestFullscreen = audio.requestFullscreen || audio.webkitRequestFullscreen || audio.msRequestFullscreen;
+            if (requestFullscreen) {
+              requestFullscreen.call(audio).catch(error => {
+                console.error('❌ Nelze spustit fullscreen pro audio:', error);
+                output.innerHTML = '<span class="status">Soubor nenalezen</span><br><span class="hint">Řekněte příkaz, např. "Zobraz vytížení", "Přehrát video školení", nebo "Spusť audio návod".</span>';
+              });
+            }
+          }
         };
         output.innerHTML = ''; // Vyčistíme před přidáním audia
       } else if (url.includes('youtube.com') || url.includes('vimeo.com') || url.includes('.mp4') || url.includes('.webm')) {
@@ -139,8 +148,8 @@
           const youtubeId = new URL(url).searchParams.get('v') || url.split('v=')[1]?.split('&')[0];
           if (youtubeId) {
             mediaElement = document.createElement('iframe');
-            mediaElement.width = '100%';
-            mediaElement.height = '600px'; // Zvětšené na desktopu, upravíme na mobilu
+            mediaElement.width = window.innerWidth > 768 ? '100vw' : '100%'; // Plná šířka na desktopu, 100% na mobilu
+            mediaElement.height = window.innerWidth > 768 ? '600px' : '100%'; // 600px na desktopu, plná výška na mobilu
             mediaElement.src = `https://www.youtube.com/embed/${youtubeId}`;
             mediaElement.allow = 'autoplay; encrypted-media; fullscreen';
             mediaElement.allowFullscreen = true;
@@ -149,8 +158,8 @@
           const vimeoId = url.split('/').pop();
           if (vimeoId) {
             mediaElement = document.createElement('iframe');
-            mediaElement.width = '100%';
-            mediaElement.height = '600px'; // Zvětšené na desktopu, upravíme na mobilu
+            mediaElement.width = window.innerWidth > 768 ? '100vw' : '100%'; // Plná šířka na desktopu, 100% na mobilu
+            mediaElement.height = window.innerWidth > 768 ? '600px' : '100%'; // 600px na desktopu, plná výška na mobilu
             mediaElement.src = `https://player.vimeo.com/video/${vimeoId}`;
             mediaElement.allow = 'autoplay; encrypted-media; fullscreen';
             mediaElement.allowFullscreen = true;
@@ -158,8 +167,8 @@
         } else {
           mediaElement = document.createElement('video');
           mediaElement.controls = true;
-          mediaElement.width = '100%';
-          mediaElement.height = '600px'; // Zvětšené na desktopu, upravíme na mobilu
+          mediaElement.width = window.innerWidth > 768 ? 1920 : '100%'; // 1920px (16:9 pro 600px výšku) na desktopu, 100% na mobilu
+          mediaElement.height = window.innerWidth > 768 ? 600 : '100%'; // 600px na desktopu, plná výška na mobilu
           mediaElement.src = url;
         }
         if (mediaElement) {
