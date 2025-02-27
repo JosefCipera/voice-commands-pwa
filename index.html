@@ -154,10 +154,10 @@
           if (youtubeId) {
             mediaElement = document.createElement('iframe');
             mediaElement.width = window.innerWidth > 768 ? '533' : '100%'; // Zachováme zvětšení na 533px na desktopu, 100% na mobilu
-            mediaElement.height = window.innerWidth > 768 ? '300' : '100%'; // Zachováme výšku 300px pro poměr 16:9 na desktopu, plná výška na mobilu
+            mediaElement.height = window.innerWidth > 768 ? '300' : '400'; // Zachováme výšku 300px na desktopu, vrátíme 400px na mobilu
             mediaElement.style.width = '533px !important'; // Přidáme inline style pro prioritu
-            mediaElement.style.height = '300px !important'; // Přidáme inline style pro prioritu
-            mediaElement.style.objectFit = 'cover'; // Roztažení videa na plnou šířku a výšku, minimalizace černých pruhů (může oříznout okraje)
+            mediaElement.style.height = window.innerWidth > 768 ? '300px !important' : '400px !important'; // Přidáme inline style pro prioritu
+            mediaElement.style.objectFit = window.innerWidth > 768 ? 'cover' : 'contain'; // Zachováme cover na desktopu, contain na mobilu
             mediaElement.src = `https://www.youtube.com/embed/${youtubeId}?autoplay=1&enablejsapi=1`; // Přidáme enablejsapi pro kontrolu přes API
             mediaElement.allow = 'autoplay; encrypted-media; fullscreen';
             mediaElement.allowFullscreen = true;
@@ -167,7 +167,10 @@
                 new window.YT.Player(mediaElement, {
                   events: {
                     'onReady': function(event) {
-                      event.target.setSize(533, 300); // Explicitní nastavení velikosti
+                      event.target.setSize(
+                        window.innerWidth > 768 ? 533 : 100, // Šířka na desktopu/mobilu
+                        window.innerWidth > 768 ? 300 : 400 // Výška na desktopu/mobilu
+                      );
                     }
                   }
                 });
@@ -179,10 +182,10 @@
           if (vimeoId) {
             mediaElement = document.createElement('iframe');
             mediaElement.width = window.innerWidth > 768 ? '533' : '100%'; // Zachováme zvětšení na 533px na desktopu, 100% na mobilu
-            mediaElement.height = window.innerWidth > 768 ? '300' : '100%'; // Zachováme výšku 300px pro poměr 16:9 na desktopu, plná výška na mobilu
+            mediaElement.height = window.innerWidth > 768 ? '300' : '400'; // Zachováme výšku 300px na desktopu, vrátíme 400px na mobilu
             mediaElement.style.width = '533px !important'; // Přidáme inline style pro prioritu
-            mediaElement.style.height = '300px !important'; // Přidáme inline style pro prioritu
-            mediaElement.style.objectFit = 'cover'; // Roztažení videa na plnou šířku a výšku, minimalizace černých pruhů (může oříznout okraje)
+            mediaElement.style.height = window.innerWidth > 768 ? '300px !important' : '400px !important'; // Přidáme inline style pro prioritu
+            mediaElement.style.objectFit = window.innerWidth > 768 ? 'cover' : 'contain'; // Zachováme cover na desktopu, contain na mobilu
             mediaElement.src = `https://player.vimeo.com/video/${vimeoId}?autoplay=1`; // Přidáme autoplay
             mediaElement.allow = 'autoplay; encrypted-media; fullscreen';
             mediaElement.allowFullscreen = true;
@@ -191,10 +194,10 @@
           mediaElement = document.createElement('video');
           mediaElement.controls = true;
           mediaElement.width = window.innerWidth > 768 ? 533 : '100%'; // Zachováme zvětšení na 533px (16:9 pro 300px výšku) na desktopu, 100% na mobilu
-          mediaElement.height = window.innerWidth > 768 ? 300 : '100%'; // Zachováme výšku 300px pro poměr 16:9 na desktopu, plná výška na mobilu
+          mediaElement.height = window.innerWidth > 768 ? 300 : '400'; // Zachováme výšku 300px na desktopu, vrátíme 400px na mobilu
           mediaElement.style.width = '533px !important'; // Přidáme inline style pro prioritu
-          mediaElement.style.height = '300px !important'; // Přidáme inline style pro prioritu
-          mediaElement.style.objectFit = 'cover'; // Roztažení videa na plnou šířku a výšku, minimalizace černých pruhů (může oříznout okraje)
+          mediaElement.style.height = window.innerWidth > 768 ? '300px !important' : '400px !important'; // Přidáme inline style pro prioritu
+          mediaElement.style.objectFit = window.innerWidth > 768 ? 'cover' : 'contain'; // Zachováme cover na desktopu, contain na mobilu
           mediaElement.src = url;
           mediaElement.autoplay = true; // Přidáme autoplay pro okamžité přehrávání
         }
@@ -205,23 +208,7 @@
           output.innerHTML = '';
           output.appendChild(mediaElement);
 
-          // Automatické přepnutí do fullscreen režimu na mobilu
-          if (window.innerWidth <= 768 && (mediaElement instanceof HTMLIFrameElement || mediaElement instanceof HTMLVideoElement)) {
-            const requestFullscreen = mediaElement.requestFullscreen || mediaElement.webkitRequestFullscreen || mediaElement.msRequestFullscreen;
-            if (requestFullscreen) {
-              requestFullscreen.call(mediaElement).catch(error => {
-                console.error('❌ Nelze spustit fullscreen:', error);
-                // Fallback: Pokusíme se nastavit maximální velikost, pokud fullscreen selže
-                mediaElement.width = '100%';
-                mediaElement.height = '100%';
-                output.innerHTML = '<span class="status">Soubor nenalezen</span><br><span class="hint">Řekněte příkaz, např. "Zobraz vytížení", "Přehrát video školení", nebo "Spusť audio návod".</span>';
-              });
-            } else {
-              // Fallback bez fullscreenu
-              mediaElement.width = '100%';
-              mediaElement.height = '100%';
-            }
-          }
+          // Odstranili jsme automatické přepnutí do fullscreen režimu na mobilu
         } else {
           output.innerHTML = '<span class="status">Soubor nenalezen</span><br><span class="hint">Řekněte příkaz, např. "Zobraz vytížení", "Přehrát video školení", nebo "Spusť audio návod".</span>';
         }
