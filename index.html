@@ -43,15 +43,20 @@
     };
 
     document.getElementById('start-speech').addEventListener('click', () => {
+      console.log('🎤 Poklep na mikrofon – spouštím hlasové rozpoznávání...');
+      if (!recognition) {
+        console.error('❌ SpeechRecognition není inicializováno.');
+        alert('Hlasové rozpoznávání není k dispozici. Zkuste obnovit stránku nebo zkontrolovat prohlížeč.');
+        return;
+      }
       recognition.start();
-      console.log('🎤 Hlasové rozpoznávání spuštěno...');
       document.getElementById('start-speech').classList.add('recording');
 
       // Automatické zastavení po 10 sekundách
       setTimeout(() => {
         if (recognition) {
-          recognition.stop();
           console.log('🔇 Hlasové rozpoznávání automaticky ukončeno po 10 sekundách.');
+          recognition.stop();
           document.getElementById('start-speech').classList.remove('recording');
         }
       }, 10000);
@@ -148,8 +153,8 @@
           const youtubeId = new URL(url).searchParams.get('v') || url.split('v=')[1]?.split('&')[0];
           if (youtubeId) {
             mediaElement = document.createElement('iframe');
-            mediaElement.width = window.innerWidth > 768 ? '533' : '100%'; // Zvětšení na 533px na desktopu, 100% na mobilu
-            mediaElement.height = window.innerWidth > 768 ? '300' : '100%'; // Nová výška 300px pro poměr 16:9 na desktopu, plná výška na mobilu
+            mediaElement.width = window.innerWidth > 768 ? '533' : '100%'; // Zachováme zvětšení na 533px na desktopu, 100% na mobilu
+            mediaElement.height = window.innerWidth > 768 ? '300' : '100%'; // Zachováme výšku 300px pro poměr 16:9 na desktopu, plná výška na mobilu
             mediaElement.style.width = '533px !important'; // Přidáme inline style pro prioritu
             mediaElement.style.height = '300px !important'; // Přidáme inline style pro prioritu
             mediaElement.style.objectFit = 'cover'; // Roztažení videa na plnou šířku a výšku, minimalizace černých pruhů (může oříznout okraje)
@@ -173,8 +178,8 @@
           const vimeoId = url.split('/').pop();
           if (vimeoId) {
             mediaElement = document.createElement('iframe');
-            mediaElement.width = window.innerWidth > 768 ? '533' : '100%'; // Zvětšení na 533px na desktopu, 100% na mobilu
-            mediaElement.height = window.innerWidth > 768 ? '300' : '100%'; // Nová výška 300px pro poměr 16:9 na desktopu, plná výška na mobilu
+            mediaElement.width = window.innerWidth > 768 ? '533' : '100%'; // Zachováme zvětšení na 533px na desktopu, 100% na mobilu
+            mediaElement.height = window.innerWidth > 768 ? '300' : '100%'; // Zachováme výšku 300px pro poměr 16:9 na desktopu, plná výška na mobilu
             mediaElement.style.width = '533px !important'; // Přidáme inline style pro prioritu
             mediaElement.style.height = '300px !important'; // Přidáme inline style pro prioritu
             mediaElement.style.objectFit = 'cover'; // Roztažení videa na plnou šířku a výšku, minimalizace černých pruhů (může oříznout okraje)
@@ -185,8 +190,8 @@
         } else {
           mediaElement = document.createElement('video');
           mediaElement.controls = true;
-          mediaElement.width = window.innerWidth > 768 ? 533 : '100%'; // Zvětšení na 533px (16:9 pro 300px výšku) na desktopu, 100% na mobilu
-          mediaElement.height = window.innerWidth > 768 ? 300 : '100%'; // Nová výška 300px pro poměr 16:9 na desktopu, plná výška na mobilu
+          mediaElement.width = window.innerWidth > 768 ? 533 : '100%'; // Zachováme zvětšení na 533px (16:9 pro 300px výšku) na desktopu, 100% na mobilu
+          mediaElement.height = window.innerWidth > 768 ? 300 : '100%'; // Zachováme výšku 300px pro poměr 16:9 na desktopu, plná výška na mobilu
           mediaElement.style.width = '533px !important'; // Přidáme inline style pro prioritu
           mediaElement.style.height = '300px !important'; // Přidáme inline style pro prioritu
           mediaElement.style.objectFit = 'cover'; // Roztažení videa na plnou šířku a výšku, minimalizace černých pruhů (může oříznout okraje)
