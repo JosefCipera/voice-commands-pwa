@@ -34,7 +34,7 @@ html {
 }
 
 .mic-icon {
-    width: 250px; /* Zmenšení mikrofonu na desktopu (můžeme upravit) */
+    width: 250px; /* Zachováme zmenšení mikrofonu (můžeme upravit) */
     height: auto; /* Zachování poměru */
     cursor: pointer;
     transition: opacity 0.3s; /* Změníme na opacity pro lepší efekt */
@@ -49,10 +49,10 @@ html {
 }
 
 #output {
-    font-size: 18px;
+    font-size: 20px; /* Trochu zvětšíme text pro lepší čitelnost */
     color: #333;
     text-align: center;
-    margin-top: 0px; /* Blízkost k mikrofonu */
+    margin-top: 20px !important; /* Přidáme mezeru mezi mikrofonem a videem */
     max-width: none !important; /* Odstraníme omezení šířky */
     width: 100%; /* Plná šířka kontejneru */
     box-sizing: border-box; /* Zajistíme správné výpočty */
@@ -73,7 +73,7 @@ html {
     display: block;
 }
 
-/* Desktop – zúžené video pod mikrofonem, správný poměr stran */
+/* Desktop – zúžené video pod mikrofonem, správný poměr stran, mezera */
 @media (min-width: 769px) {
     .mic-icon {
         width: 250px; /* Zachováme zmenšení mikrofonu */
@@ -84,15 +84,15 @@ html {
     }
     #output {
         position: relative; /* Vrátíme video do .bottom-half */
-        width: 500px !important; /* Zachováme šířku videa */
+        width: 400px !important; /* Zúžení šířky videa (můžeme upravit) */
         margin: 0 auto !important; /* Centrování videa v rámci stránky */
         padding: 0 !important; /* Odstraníme padding */
     }
     #output audio, #output video, #output iframe {
-        height: 281.25px; /* Správná výška pro poměr 16:9 s šířkou 500px */
-        width: 500px !important; /* Zachováme šířku videa */
+        height: 225px !important; /* Správná výška pro poměr 16:9 s šířkou 400px */
+        width: 400px !important; /* Zúžení šířky videa */
         max-width: none !important; /* Odstraníme případné omezení */
-        object-fit: contain; /* Zachování proporce bez deformace */
+        object-fit: contain; /* Zachování proporce bez deformace (minimalizace černých pruhů) */
         margin: 0 !important; /* Odstraníme margin */
         padding: 0 !important; /* Odstraníme padding */
         border: none !important; /* Odstraníme okraje */
