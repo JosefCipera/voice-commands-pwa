@@ -13,6 +13,7 @@ body {
     height: 100%;
     display: flex;
     flex-direction: column;
+    position: relative; /* Pro umístění videa mimo kontejner */
 }
 
 .top-half, .bottom-half {
@@ -60,15 +61,28 @@ body {
     display: block;
 }
 
-/* Desktop – zvětšené video */
+/* Desktop – zvětšené video mimo kontejner */
 @media (min-width: 769px) {
     .mic-icon {
         width: 350px;
     }
+    #output {
+        position: absolute; /* Umístíme video mimo .bottom-half */
+        top: 50%; /* Vycentrování vertikálně */
+        left: 0;
+        width: 100vw; /* Plná šířka stránky */
+        transform: translateY(-50%); /* Vycentrování vertikálně */
+        z-index: 1; /* Aby bylo nad mikrofonem */
+    }
     #output audio, #output video, #output iframe {
-        height: 600px; /* Zvětšení videa na desktopu */
-        max-width: 100%; /* Plná šířka kontejneru */
-        object-fit: contain; /* Zachování proporce */
+        height: 600px; /* Zvětšená výška pro 16:9 poměr (typický pro videa) */
+        width: 100%; /* Plná šířka kontejneru */
+        max-width: 100vw; /* Omezení na šířku viewportu */
+        object-fit: contain; /* Zachování proporce bez deformace */
+    }
+    .bottom-half {
+        position: relative; /* Pro absolutní pozici #output */
+        z-index: 0; /* Pod videem */
     }
 }
 
