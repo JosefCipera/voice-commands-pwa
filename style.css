@@ -13,6 +13,7 @@ body {
     height: 100%;
     display: flex;
     flex-direction: column;
+    z-index: -1; /* Snížíme z-index kontejneru, aby neblokoval vlny */
 }
 
 .top-half, .bottom-half {
@@ -20,11 +21,12 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: -1; /* Snížíme z-index, aby neblokoval vlny */
 }
 
 .mic-icon {
     width: 350px; /* Pevná šířka pro desktop */
-    height: auto; /* Zachování poměru */
+    height: 350px; /* Rovná výška pro kruh */
     cursor: pointer;
     transition: opacity 0.3s; /* Změníme na opacity pro lepší efekt */
     background: #ffffff !important; /* Zajistíme neprůhledné bílé pozadí */
@@ -35,11 +37,13 @@ body {
     overflow: hidden; /* Zajistíme, že vlny nebudou přetékat mimo mikrofon */
 }
 
+/* Debug – přidáme červenou obrysovou čáru pro kontrolu */
 .mic-icon.recording {
     opacity: 0.7; /* Změníme průhlednost během nahrávání */
+    outline: 2px solid red !important; /* Červená obrysová čára pro debug */
 }
 
-/* Opravená animace vysílacích vln – maximální priorita, fix proporce */
+/* Opravená animace vysílacích vln – maximální priorita, fix proporce, debug */
 @keyframes pulse {
     0% {
         transform: scale(0.1);
@@ -70,12 +74,15 @@ body {
 @media (max-width: 768px) {
     .mic-icon {
         width: 50vw; /* Polovina šířky mobilu */
-        height: 50vw; /* Rovná výška pro kruhový tvar */
+        height: 50vw; /* Rovná výška pro kruh */
         max-width: none; /* Žádné omezení na mobilu */
         background: transparent !important; /* Bez pozadí na mobilu, aby kontrastoval s modrou plochou */
         border: none !important; /* Odstraníme modrý okraj, aby nekonfliktoval s vlnami */
-        position: relative !important; /* Pro absolutní pozici ::after */
         border-radius: 10px; /* Zachováme zaokrouhlení pro estetiku */
+        position: relative !important; /* Pro absolutní pozici ::after */
+    }
+    .mic-icon.recording {
+        outline: 2px solid red !important; /* Červená obrysová čára pro debug na mobilu */
     }
     .mic-icon.recording::after {
         background: rgba(68, 68, 255, 0.3) !important; /* Stejná barva na mobilu */
