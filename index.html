@@ -148,9 +148,9 @@
           const youtubeId = new URL(url).searchParams.get('v') || url.split('v=')[1]?.split('&')[0];
           if (youtubeId) {
             mediaElement = document.createElement('iframe');
-            mediaElement.width = window.innerWidth > 768 ? '1920' : '100%'; // 1920px na desktopu, 100% na mobilu
+            mediaElement.width = window.innerWidth > 768 ? '600' : '100%'; // 600px na desktopu, 100% na mobilu
             mediaElement.height = window.innerWidth > 768 ? '600' : '100%'; // 600px na desktopu, plná výška na mobilu
-            mediaElement.style.width = '100vw !important'; // Přidáme inline style pro prioritu
+            mediaElement.style.width = '600px !important'; // Přidáme inline style pro prioritu
             mediaElement.style.height = '600px !important'; // Přidáme inline style pro prioritu
             mediaElement.style.objectFit = 'contain'; // Zachování proporce
             mediaElement.src = `https://www.youtube.com/embed/${youtubeId}?autoplay=1&enablejsapi=1`; // Přidáme enablejsapi pro kontrolu přes API
@@ -162,7 +162,7 @@
                 new window.YT.Player(mediaElement, {
                   events: {
                     'onReady': function(event) {
-                      event.target.setSize(1920, 600); // Explicitní nastavení velikosti
+                      event.target.setSize(600, 600); // Explicitní nastavení velikosti
                     }
                   }
                 });
@@ -173,9 +173,9 @@
           const vimeoId = url.split('/').pop();
           if (vimeoId) {
             mediaElement = document.createElement('iframe');
-            mediaElement.width = window.innerWidth > 768 ? '1920' : '100%'; // 1920px na desktopu, 100% na mobilu
+            mediaElement.width = window.innerWidth > 768 ? '600' : '100%'; // 600px na desktopu, 100% na mobilu
             mediaElement.height = window.innerWidth > 768 ? '600' : '100%'; // 600px na desktopu, plná výška na mobilu
-            mediaElement.style.width = '100vw !important'; // Přidáme inline style pro prioritu
+            mediaElement.style.width = '600px !important'; // Přidáme inline style pro prioritu
             mediaElement.style.height = '600px !important'; // Přidáme inline style pro prioritu
             mediaElement.style.objectFit = 'contain'; // Zachování proporce
             mediaElement.src = `https://player.vimeo.com/video/${vimeoId}?autoplay=1`; // Přidáme autoplay
@@ -185,9 +185,9 @@
         } else {
           mediaElement = document.createElement('video');
           mediaElement.controls = true;
-          mediaElement.width = window.innerWidth > 768 ? 1920 : '100%'; // 1920px (16:9 pro 600px výšku) na desktopu, 100% na mobilu
+          mediaElement.width = window.innerWidth > 768 ? 600 : '100%'; // 600px (16:9 pro 600px výšku) na desktopu, 100% na mobilu
           mediaElement.height = window.innerWidth > 768 ? 600 : '100%'; // 600px na desktopu, plná výška na mobilu
-          mediaElement.style.width = '100vw !important'; // Přidáme inline style pro prioritu
+          mediaElement.style.width = '600px !important'; // Přidáme inline style pro prioritu
           mediaElement.style.height = '600px !important'; // Přidáme inline style pro prioritu
           mediaElement.style.objectFit = 'contain'; // Zachování proporce
           mediaElement.src = url;
