@@ -148,10 +148,10 @@
           const youtubeId = new URL(url).searchParams.get('v') || url.split('v=')[1]?.split('&')[0];
           if (youtubeId) {
             mediaElement = document.createElement('iframe');
-            mediaElement.width = window.innerWidth > 768 ? '500' : '100%'; // 500px na desktopu, 100% na mobilu
-            mediaElement.height = window.innerWidth > 768 ? '600' : '100%'; // 600px na desktopu, plná výška na mobilu
+            mediaElement.width = window.innerWidth > 768 ? '500' : '100%'; // Zachováme šířku 500px na desktopu, 100% na mobilu
+            mediaElement.height = window.innerWidth > 768 ? '281.25' : '100%'; // Nová výška 281.25px pro poměr 16:9 na desktopu, plná výška na mobilu
             mediaElement.style.width = '500px !important'; // Přidáme inline style pro prioritu
-            mediaElement.style.height = '600px !important'; // Přidáme inline style pro prioritu
+            mediaElement.style.height = '281.25px !important'; // Přidáme inline style pro prioritu
             mediaElement.style.objectFit = 'contain'; // Zachování proporce
             mediaElement.src = `https://www.youtube.com/embed/${youtubeId}?autoplay=1&enablejsapi=1`; // Přidáme enablejsapi pro kontrolu přes API
             mediaElement.allow = 'autoplay; encrypted-media; fullscreen';
@@ -162,7 +162,7 @@
                 new window.YT.Player(mediaElement, {
                   events: {
                     'onReady': function(event) {
-                      event.target.setSize(500, 600); // Explicitní nastavení velikosti
+                      event.target.setSize(500, 281.25); // Explicitní nastavení velikosti
                     }
                   }
                 });
@@ -173,10 +173,10 @@
           const vimeoId = url.split('/').pop();
           if (vimeoId) {
             mediaElement = document.createElement('iframe');
-            mediaElement.width = window.innerWidth > 768 ? '500' : '100%'; // 500px na desktopu, 100% na mobilu
-            mediaElement.height = window.innerWidth > 768 ? '600' : '100%'; // 600px na desktopu, plná výška na mobilu
+            mediaElement.width = window.innerWidth > 768 ? '500' : '100%'; // Zachováme šířku 500px na desktopu, 100% na mobilu
+            mediaElement.height = window.innerWidth > 768 ? '281.25' : '100%'; // Nová výška 281.25px pro poměr 16:9 na desktopu, plná výška na mobilu
             mediaElement.style.width = '500px !important'; // Přidáme inline style pro prioritu
-            mediaElement.style.height = '600px !important'; // Přidáme inline style pro prioritu
+            mediaElement.style.height = '281.25px !important'; // Přidáme inline style pro prioritu
             mediaElement.style.objectFit = 'contain'; // Zachování proporce
             mediaElement.src = `https://player.vimeo.com/video/${vimeoId}?autoplay=1`; // Přidáme autoplay
             mediaElement.allow = 'autoplay; encrypted-media; fullscreen';
@@ -185,10 +185,10 @@
         } else {
           mediaElement = document.createElement('video');
           mediaElement.controls = true;
-          mediaElement.width = window.innerWidth > 768 ? 500 : '100%'; // 500px (16:9 pro 600px výšku) na desktopu, 100% na mobilu
-          mediaElement.height = window.innerWidth > 768 ? 600 : '100%'; // 600px na desktopu, plná výška na mobilu
+          mediaElement.width = window.innerWidth > 768 ? 500 : '100%'; // Zachováme šířku 500px (16:9 pro 281.25px výšku) na desktopu, 100% na mobilu
+          mediaElement.height = window.innerWidth > 768 ? 281.25 : '100%'; // Nová výška 281.25px pro poměr 16:9 na desktopu, plná výška na mobilu
           mediaElement.style.width = '500px !important'; // Přidáme inline style pro prioritu
-          mediaElement.style.height = '600px !important'; // Přidáme inline style pro prioritu
+          mediaElement.style.height = '281.25px !important'; // Přidáme inline style pro prioritu
           mediaElement.style.objectFit = 'contain'; // Zachování proporce
           mediaElement.src = url;
           mediaElement.autoplay = true; // Přidáme autoplay pro okamžité přehrávání
