@@ -34,7 +34,7 @@ html {
 }
 
 .mic-icon {
-    width: 250px; /* Zachováme zmenšení mikrofonu (můžeme upravit) */
+    width: 250px; /* Zachováme zmenšení mikrofonu na desktopu (můžeme upravit) */
     height: auto; /* Zachování poměru */
     cursor: pointer;
     transition: opacity 0.3s; /* Změníme na opacity pro lepší efekt */
@@ -52,7 +52,7 @@ html {
     font-size: 20px; /* Trochu zvětšíme text pro lepší čitelnost */
     color: #333;
     text-align: center;
-    margin-top: 20px !important; /* Přiblížení videa k mikrofonu (můžeme upravit) */
+    margin-top: 20px !important; /* Zachováme mezeru mezi mikrofonem a videem na desktopu */
     max-width: none !important; /* Odstraníme omezení šířky */
     width: 100%; /* Plná šířka kontejneru */
     box-sizing: border-box; /* Zajistíme správné výpočty */
@@ -84,13 +84,13 @@ html {
     }
     #output {
         position: relative; /* Vrátíme video do .bottom-half */
-        width: 533px !important; /* Zvětšení videa o třetinu (400px × 1.333 ≈ 533px) */
+        width: 533px !important; /* Zachováme zvětšení videa */
         margin: 0 auto !important; /* Centrování videa v rámci stránky */
         padding: 0 !important; /* Odstraníme padding */
     }
     #output audio, #output video, #output iframe {
-        height: 300px !important; /* Nová výška pro poměr 16:9 s šířkou 533px (533 ÷ 16 × 9 = 300) */
-        width: 533px !important; /* Zvětšení šířky videa */
+        height: 300px !important; /* Zachováme výšku pro poměr 16:9 s šířkou 533px */
+        width: 533px !important; /* Zachováme zvětšení šířky videa */
         max-width: none !important; /* Odstraníme případné omezení */
         object-fit: cover; /* Roztažení videa na plnou šířku a výšku, minimalizace černých pruhů (může oříznout okraje) */
         margin: 0 !important; /* Odstraníme margin */
@@ -99,13 +99,13 @@ html {
     }
 }
 
-/* Mobil – video na maximální obrazovce */
+/* Mobil – video pod mikrofonem, bez modrého okraje u mikrofonu */
 @media (max-width: 768px) {
     .mic-icon {
         width: 50vw; /* Polovina šířky mobilu */
         max-width: none; /* Žádné omezení na mobilu */
         background: transparent; /* Bez pozadí na mobilu, aby kontrastoval s modrou plochou */
-        border: 2px solid #4444ff; /* Modrý okraj pro lepší viditelnost na mobilu */
+        border: none; /* Odstraníme modrý okraj */
         box-sizing: border-box; /* Zajistíme správné výpočty */
     }
     .bottom-half {
@@ -113,7 +113,7 @@ html {
         padding-top: 80px; /* Zůstáváme u 80px pro posun nahoru */
     }
     #output audio, #output video, #output iframe {
-        height: 400px; /* Původní výška pro mobil */
+        height: 400px; /* Zachováme původní výšku pro mobil */
         max-width: 100%; /* Normální šířka na mobilu */
         object-fit: contain; /* Zachování proporce */
         box-sizing: border-box; /* Zajistíme správné výpočty */
