@@ -140,7 +140,7 @@
           if (youtubeId) {
             mediaElement = document.createElement('iframe');
             mediaElement.width = '100%';
-            mediaElement.height = '267.75px'; // Desktop výška
+            mediaElement.height = '600px'; // Zvětšené na desktopu, upravíme na mobilu
             mediaElement.src = `https://www.youtube.com/embed/${youtubeId}`;
             mediaElement.allow = 'autoplay; encrypted-media; fullscreen';
             mediaElement.allowFullscreen = true;
@@ -150,7 +150,7 @@
           if (vimeoId) {
             mediaElement = document.createElement('iframe');
             mediaElement.width = '100%';
-            mediaElement.height = '267.75px'; // Desktop výška
+            mediaElement.height = '600px'; // Zvětšené na desktopu, upravíme na mobilu
             mediaElement.src = `https://player.vimeo.com/video/${vimeoId}`;
             mediaElement.allow = 'autoplay; encrypted-media; fullscreen';
             mediaElement.allowFullscreen = true;
@@ -159,7 +159,7 @@
           mediaElement = document.createElement('video');
           mediaElement.controls = true;
           mediaElement.width = '100%';
-          mediaElement.height = '267.75px'; // Desktop výška
+          mediaElement.height = '600px'; // Zvětšené na desktopu, upravíme na mobilu
           mediaElement.src = url;
         }
         if (mediaElement) {
@@ -168,6 +168,17 @@
           };
           output.innerHTML = '';
           output.appendChild(mediaElement);
+
+          // Automatické přepnutí do fullscreen režimu na mobilu
+          if (window.innerWidth <= 768 && (mediaElement instanceof HTMLIFrameElement || mediaElement instanceof HTMLVideoElement)) {
+            const requestFullscreen = mediaElement.requestFullscreen || mediaElement.webkitRequestFullscreen || mediaElement.msRequestFullscreen;
+            if (requestFullscreen) {
+              requestFullscreen.call(mediaElement).catch(error => {
+                console.error('❌ Nelze spustit fullscreen:', error);
+                output.innerHTML = '<span class="status">Soubor nenalezen</span><br><span class="hint">Řekněte příkaz, např. "Zobraz vytížení", "Přehrát video školení", nebo "Spusť audio návod".</span>';
+              });
+            }
+          }
         } else {
           output.innerHTML = '<span class="status">Soubor nenalezen</span><br><span class="hint">Řekněte příkaz, např. "Zobraz vytížení", "Přehrát video školení", nebo "Spusť audio návod".</span>';
         }
