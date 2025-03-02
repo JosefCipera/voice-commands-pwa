@@ -31,18 +31,27 @@
     recognition.interimResults = false;
     recognition.continuous = false;
 
+    let isProcessing = false; // Proměnná pro omezení více požadavků najednou
+    let latestRequestTimestamp = 0; // Proměnná pro sledování nejnovějšího požadavku
+
     recognition.onerror = (event) => {
       console.error('❌ Chyba při hlasovém rozpoznávání:', event.error);
       alert(`Chyba při rozpoznávání hlasu: ${event.error}. Zkontrolujte povolení mikrofonu.`);
       document.getElementById('start-speech').classList.remove('recording');
+      isProcessing = false;
     };
 
     recognition.onend = () => {
       console.log('🔇 Hlasové rozpoznávání ukončeno.');
       document.getElementById('start-speech').classList.remove('recording');
+      isProcessing = false;
     };
 
     document.getElementById('start-speech').addEventListener('click', () => {
+      if (isProcessing) {
+        console.log('⏳ Jiný požadavek se již zpracovává. Počkejte prosím.');
+        return;
+      }
       console.log('🎤 Poklep na mikrofon – spouštím hlasové rozpoznávání...');
       if (!recognition) {
         console.error('❌ SpeechRecognition není inicializováno.');
@@ -51,6 +60,7 @@
       }
       recognition.start();
       document.getElementById('start-speech').classList.add('recording');
+      isProcessing = true;
 
       // Automatické zastavení po 10 sekundách
       setTimeout(() => {
@@ -58,6 +68,7 @@
           console.log('🔇 Hlasové rozpoznávání automaticky ukončeno po 10 sekundách.');
           recognition.stop();
           document.getElementById('start-speech').classList.remove('recording');
+          isProcessing = false;
         }
       }, 10000);
     });
@@ -75,20 +86,32 @@
       if (words > 10) {
         console.warn('⚠️ Příkaz je příliš dlouhý.');
         document.getElementById('output').innerHTML = '<span class="status">Soubor nenalezen</span><br><span class="hint">Řekněte příkaz, např. "Zobraz vytížení", "Přehrát video školení", nebo "Spusť audio návod".</span>';
+        isProcessing = false;
         return;
       }
 
-      const lowerCommand = command.toLowerCase();
-      console.log(`Rozpoznaný příkaz: ${lowerCommand}`);
+      // Normalizace příkazu: odstraníme extra mezery, opravíme překlepy
+      let normalizedCommand = command.toLowerCase().trim().replace(/\s+/g, ' '); // Odstraníme více mezer
+      normalizedCommand = normalizedCommand.replace('vytizení', 'vytížení'); // Opravujeme "vytizení" na "vytížení"
+      console.log(`🎙️ Normalizovaný příkaz: ${normalizedCommand}`);
 
-      const webhookUrl = "https://hook.eu1.make.com/muaobq5xfictcbdvb9p9ogxgtsmtwkuh"; // Webhook URL v Make.com
+      const webhookUrl = "https://hook.eu1.make.com/nova_url_nova"; // Aktualizuj na novou Webhook URL
 
       try {
+        const requestTimestamp = Date.now(); // Časová značka požadavku
+        latestRequestTimestamp = requestTimestamp; // Aktualizujeme nejnovější čas požadavku
+
         const response = await fetch(webhookUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ Povel: lowerCommand }) // Odesíláme celý příkaz v malých písmeních
+          body: JSON.stringify({ Povel: normalizedCommand }) // Odesíláme normalizovaný příkaz
         });
+
+        // Zpracujeme odpověď pouze, pokud je to nejnovější požadavek
+        if (requestTimestamp !== latestRequestTimestamp) {
+          console.log('⏳ Ignoruji starý požadavek, novější požadavek již běží.');
+          return;
+        }
 
         console.log("📡 HTTP status:", response.status);
 
@@ -112,6 +135,8 @@
       } catch (error) {
         console.error("❌ Chyba při komunikaci s Make:", error);
         document.getElementById('output').innerHTML = '<span class="status">Připojení selhalo</span><br><span class="hint">Zkontrolujte internet a zkuste znovu, např. "Zobraz vytížení", "Přehrát video školení", nebo "Spusť audio návod".</span>';
+      } finally {
+        isProcessing = false; // Uvolníme zámek pro další požadavky
       }
     }
 
@@ -136,15 +161,6 @@
         audio.onloadedmetadata = () => {
           output.innerHTML = '';
           output.appendChild(audio);
-          if (window.innerWidth <= 768) {
-            const requestFullscreen = audio.requestFullscreen || audio.webkitRequestFullscreen || audio.msRequestFullscreen;
-            if (requestFullscreen) {
-              requestFullscreen.call(audio).catch(error => {
-                console.error('❌ Nelze spustit fullscreen pro audio:', error);
-                output.innerHTML = '<span class="status">Soubor nenalezen</span><br><span class="hint">Řekněte příkaz, např. "Zobraz vytížení", "Přehrát video školení", nebo "Spusť audio návod".</span>';
-              });
-            }
-          }
         };
         output.innerHTML = ''; // Vyčistíme před přidáním audia
       } else if (url.includes('youtube.com') || url.includes('vimeo.com') || url.includes('.mp4') || url.includes('.webm')) {
@@ -207,8 +223,6 @@
           };
           output.innerHTML = '';
           output.appendChild(mediaElement);
-
-          // Odstranili jsme automatické přepnutí do fullscreen režimu na mobilu
         } else {
           output.innerHTML = '<span class="status">Soubor nenalezen</span><br><span class="hint">Řekněte příkaz, např. "Zobraz vytížení", "Přehrát video školení", nebo "Spusť audio návod".</span>';
         }
