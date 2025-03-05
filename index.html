@@ -1,22 +1,35 @@
 <!DOCTYPE html>
 <html lang="cs">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chytré já</title>
-  <link rel="manifest" href="/voice-commands-pwa/manifest.json">
-  <link rel="stylesheet" href="style.css">
-  <link rel="icon" type="image/png" href="/voice-commands-pwa/microphone-512.png">
+  <link rel="manifest" href="/public/manifest.json">
+  <link rel="stylesheet" href="src/css/style.css">
+  <link rel="icon" type="image/png" href="/public/images/microphone-192.png">
 </head>
+
 <body>
   <div class="container">
     <div class="top-half">
-      <img src="/voice-commands-pwa/microphone-512.png" alt="Microphone" id="start-speech" class="mic-icon">
+      <img src="public/images/microphone-192.png" alt="Microphone" id="start-speech" class="mic-icon">
     </div>
     <div class="bottom-half">
       <div id="output">Řekněte příkaz, např. 'Zobraz vytížení', 'Přehrát video školení', nebo 'Spusť audio návod'.</div>
     </div>
+    <button id="installPWA">Nainstalovat aplikaci</button>
+
   </div>
+  <script src="src/js/app.js" type="module"></script>
+  <script src="src/js/install.js" type="module"></script>
+  <script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("public/sw.js")
+        .then(() => console.log("Service Worker zaregistrován!"))
+        .catch((err) => console.log("Service Worker error:", err));
+    }
+  </script>
 
   <script>
     if (!('SpeechRecognition' in window) && !('webkitSpeechRecognition' in window)) {
@@ -195,7 +208,7 @@
               if (window.YT && window.YT.Player) {
                 new window.YT.Player(mediaElement, {
                   events: {
-                    'onReady': function(event) {
+                    'onReady': function (event) {
                       event.target.setSize(
                         window.innerWidth > 768 ? 533 : 100, // Šířka na desktopu/mobilu
                         window.innerWidth > 768 ? 300 : 400 // Výška na desktopu/mobilu
@@ -259,4 +272,5 @@
     }
   </script>
 </body>
+
 </html>
