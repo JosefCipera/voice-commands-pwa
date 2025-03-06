@@ -1,7 +1,7 @@
 import { executeCommand } from './actions.js';
-import { fetchCommands } from './actions.js'; // Přidáme načítání povelů
+import { fetchCommands } from './actions.js';
 
-let firstRecognition = true; // Sledujeme, zda je to první příkaz
+let firstRecognition = true; // Hlídáme první povel
 
 export function startSpeechRecognition() {
     if (!('webkitSpeechRecognition' in window)) {
@@ -18,11 +18,11 @@ export function startSpeechRecognition() {
         const command = event.results[0][0].transcript.toLowerCase();
         console.log("🎤 Rozpoznaný text:", command);
 
-        // Pokud je to první příkaz, načteme povely z Make
+        // Poprvé načteme povely z Make
         if (firstRecognition) {
             console.log("📡 Poprvé načítám povely z Make...");
             await fetchCommands();
-            firstRecognition = false; // Už jsme načetli, další příkazy už jen z cache
+            firstRecognition = false; // Už jsme načetli, příště už jen hledáme v cache
         }
 
         executeCommand(command);
