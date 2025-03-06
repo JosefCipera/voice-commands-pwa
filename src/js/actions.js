@@ -1,5 +1,3 @@
-let commandList = {};  // Načtené příkazy
-
 export async function fetchCommands() {
     try {
         console.log("📡 Načítám povely z Make...");
@@ -10,11 +8,15 @@ export async function fetchCommands() {
         const data = await response.json();
         console.log("📜 Přijatá data:", data);
 
-        if (typeof data !== "object") {
-            throw new Error("❌ Odpověď z Make není validní JSON objekt!");
+        // Převod do formátu commandList, pokud Make posílá pouze jedno "url"
+        if (data.url) {
+            commandList = {
+                "vytížení kapacit": data.url  // Změň podle skutečného příkazu
+            };
+        } else {
+            commandList = data;
         }
 
-        commandList = data;
         console.log("✅ Načtené povely do commandList:", commandList);
 
         if (Object.keys(commandList).length === 0) {
@@ -23,29 +25,5 @@ export async function fetchCommands() {
 
     } catch (error) {
         console.error("❌ Chyba při načítání povelů:", error);
-    }
-}
-
-
-export function executeCommand(command) {
-    console.log(`🔎 Hledám příkaz: ${command}`);
-    const recognizedUrl = document.getElementById("recognized-url");
-
-    if (commandList[command]) {
-        const url = commandList[command];
-        console.log("✅ Otevírám:", url);
-
-        // Zobrazíme URL pod mikrofonem
-        if (recognizedUrl) {
-            recognizedUrl.textContent = `Otevírám: ${url}`;
-        }
-
-        // Přesměrování na URL
-        window.location.href = url;
-    } else {
-        console.log("❌ Příkaz nenalezen v seznamu!", commandList);
-        if (recognizedUrl) {
-            recognizedUrl.textContent = `❌ Neznámý příkaz: ${command}`;
-        }
     }
 }
