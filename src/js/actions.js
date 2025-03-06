@@ -1,3 +1,5 @@
+export let commandList = {};  // Správně exportujeme seznam povelů
+
 export async function fetchCommands() {
     try {
         console.log("📡 Načítám povely z Make...");
@@ -6,24 +8,44 @@ export async function fetchCommands() {
         if (!response.ok) throw new Error(`HTTP chyba! Status: ${response.status}`);
 
         const data = await response.json();
-        console.log("📜 Přijatá data:", data);
+        console.log("📜 Přijatá data z Make:", data);
 
-        // Převod do formátu commandList, pokud Make posílá pouze jedno "url"
+        // Ověříme, zda obsahuje pouze jednu URL nebo seznam povelů
         if (data.url) {
-            commandList = {
-                "vytížení kapacit": data.url  // Změň podle skutečného příkazu
-            };
+            console.warn("⚠️ Make vrátil pouze jednu URL, převádím na seznam povelů...");
+            commandList = { "vytížení kapacit": data.url }; // Přizpůsob formátu
         } else {
             commandList = data;
         }
 
         console.log("✅ Načtené povely do commandList:", commandList);
 
-        if (Object.keys(commandList).length === 0) {
-            console.warn("⚠️ Seznam povelů je prázdný!");
-        }
-
     } catch (error) {
         console.error("❌ Chyba při načítání povelů:", error);
     }
 }
+
+export function executeCommand(command) {
+    console.log(`🔎 Hledám příkaz: ${command}`);
+    console.log("📜 Aktuální commandList:", commandList);
+
+    const recognizedUrl = document.getElementById("recognized-url");
+
+    if (commandList[command]) {
+        const url = commandList[command];
+        console.log("✅ Otevírám:", url);
+
+        if (recognizedUrl) {
+            recognizedUrl.textContent = `Otevírám: ${url}`;
+        }
+
+        window.location.href = url;
+    } else {
+        console.log("❌ Příkaz nenalezen v seznamu!", command);
+        if (recognizedUrl) {
+            recognizedUrl.textContent = `❌ Neznámý příkaz: ${command}`;
+        }
+    }
+}
+
+export { commandList }; // 💡 Tento export je důležitý!
