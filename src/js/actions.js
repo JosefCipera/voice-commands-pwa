@@ -2,7 +2,7 @@ let commandList = {};  // Sem se načtou dynamické povely
 
 export async function fetchCommands() {
     try {
-        const response = await fetch("https://hook.eu1.make.com/https://hook.eu1.make.com/17gn7hrtmnfgsykl52dcn2ekx15nvh1fK_URL");
+        const response = await fetch("https://hook.eu1.make.com/17gn7hrtmnfgsykl52dcn2ekx15nvh1f");
         commandList = await response.json();
         console.log("📜 Načtené povely:", commandList);
     } catch (error) {
