@@ -1,4 +1,4 @@
-import { executeCommand, fetchCommands, commandList } from './actions.js';
+import { executeCommand, fetchCommands } from './actions.js';
 
 let firstRecognition = true;
 
@@ -20,7 +20,6 @@ export function startSpeechRecognition() {
         if (firstRecognition) {
             console.log("📡 Poprvé načítám povely z Make...");
             await fetchCommands();
-            console.log("✅ Načtené povely do commandList:", commandList);
             firstRecognition = false;
         }
 
@@ -29,3 +28,9 @@ export function startSpeechRecognition() {
 
     recognition.start();
 }
+
+// ✅ Mikrofon se spustí až po kliknutí na ikonku
+document.getElementById("start-speech").addEventListener("click", () => {
+    console.log("🎤 Klik na mikrofon, spouštím rozpoznávání...");
+    startSpeechRecognition();
+});
