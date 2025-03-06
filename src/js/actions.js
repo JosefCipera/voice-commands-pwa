@@ -4,7 +4,7 @@ export async function fetchCommands() {
     try {
         console.log("📡 Načítám povely z Make...");
 
-        const response = await fetch("https://hook.eu1.make.com/17gn7hrtmnfgsykl52dcn2ekx15nvh1fK");
+        const response = await fetch("https://hook.eu1.make.com/17gn7hrtmnfgsykl52dcn2ekx15nvh1f");
         if (!response.ok) throw new Error(`HTTP chyba! Status: ${response.status}`);
 
         const data = await response.json();
