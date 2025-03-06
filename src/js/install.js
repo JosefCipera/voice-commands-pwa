@@ -11,9 +11,9 @@ document.getElementById("installPWA").addEventListener("click", () => {
         deferredPrompt.prompt();
         deferredPrompt.userChoice.then((choiceResult) => {
             if (choiceResult.outcome === "accepted") {
-                console.log("Uživatel aplikaci nainstaloval");
+                console.log("✅ Uživatel aplikaci nainstaloval");
             } else {
-                console.log("Uživatel instalaci odmítl");
+                console.log("❌ Uživatel instalaci odmítl");
             }
             deferredPrompt = null;
         });
