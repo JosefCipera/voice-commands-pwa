@@ -5,12 +5,18 @@ export async function fetchCommands() {
         console.log("📡 Načítám povely z Make...");
 
         const response = await fetch("https://hook.eu1.make.com/17gn7hrtmnfgsykl52dcn2ekx15nvh1fK");
-        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+        if (!response.ok) throw new Error(`HTTP chyba! Status: ${response.status}`);
 
-        commandList = await response.json();
-        console.log("📜 Načtené povely:", commandList);
+        const data = await response.json();
+        console.log("📜 Přijatá data:", data);
 
-        // Ověření, zda je seznam povelů platný
+        if (typeof data !== "object") {
+            throw new Error("❌ Odpověď z Make není validní JSON objekt!");
+        }
+
+        commandList = data;
+        console.log("✅ Načtené povely do commandList:", commandList);
+
         if (Object.keys(commandList).length === 0) {
             console.warn("⚠️ Seznam povelů je prázdný!");
         }
@@ -19,6 +25,7 @@ export async function fetchCommands() {
         console.error("❌ Chyba při načítání povelů:", error);
     }
 }
+
 
 export function executeCommand(command) {
     console.log(`🔎 Hledám příkaz: ${command}`);
