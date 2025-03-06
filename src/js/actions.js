@@ -10,12 +10,12 @@ export async function fetchCommands() {
         const data = await response.json();
         console.log("📜 Přijatá data z Make:", data);
 
-        // Ověříme, zda obsahuje pouze jednu URL nebo seznam povelů
+        // Pokud Make vrací objekt s klíčem "url", převedeme ho na seznam příkazů
         if (data.url) {
             console.warn("⚠️ Make vrátil pouze jednu URL, převádím na seznam povelů...");
-            commandList = { "vytížení kapacit": data.url }; // Přizpůsob formátu
+            commandList = { "vytížení kapacit": data.url }; // Můžeš upravit klíč podle svého příkazu
         } else {
-            commandList = data;
+            commandList = data;  // Pokud už je ve správném formátu, použijeme ho přímo
         }
 
         console.log("✅ Načtené povely do commandList:", commandList);
@@ -24,6 +24,7 @@ export async function fetchCommands() {
         console.error("❌ Chyba při načítání povelů:", error);
     }
 }
+
 
 export function executeCommand(command) {
     console.log(`🔎 Hledám příkaz: ${command}`);
@@ -48,4 +49,3 @@ export function executeCommand(command) {
     }
 }
 
-export { commandList }; // 💡 Tento export je důležitý!
