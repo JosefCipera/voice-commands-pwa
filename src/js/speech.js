@@ -13,7 +13,14 @@ export function startSpeechRecognition() {
 
     recognition.onresult = function (event) {
         const command = event.results[0][0].transcript.toLowerCase();
-        console.log("Rozpoznaný text:", command);
+        console.log("🎤 Rozpoznaný text:", command);
+
+        // Přidáme výpis do HTML
+        const output = document.getElementById("recognized-text");
+        if (output) {
+            output.textContent = `Rozpoznáno: ${command}`;
+        }
+
         executeCommand(command);
     };
 
