@@ -1,39 +1,59 @@
 export let commandList = {};  // Správně exportujeme seznam povelů
 
-export async function fetchCommands() {
+export async function fetchCommands(command) {
+    console.log("🎤 Načítám URL pro příkaz:", command);
+
+    const webhookUrl = "https://hook.eu1.make.com/your-webhook-url"; // Aktualizuj URL
+
     try {
-        console.log("📡 Načítám povely z Make...");
+        const response = await fetch(webhookUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ Povel: command })
+        });
 
-        const response = await fetch("https://hook.eu1.make.com/17gn7hrtmnfgsykl52dcn2ekx15nvh1f");
-        if (!response.ok) throw new Error(`HTTP chyba! Status: ${response.status}`);
+        console.log("🔍 HTTP status:", response.status);
 
-        const data = await response.json();
-        console.log("📜 Přijatá data z Make:", data);
-
-        // Pokud Make vrací objekt s klíčem "url", převedeme ho na seznam příkazů
-        if (data.url) {
-            console.warn("⚠️ Make vrátil pouze jednu URL, převádím na seznam povelů...");
-            commandList = { "vytížení kapacit": data.url }; // Můžeš upravit klíč podle svého příkazu
-        } else {
-            commandList = data;  // Pokud už je ve správném formátu, použijeme ho přímo
+        if (!response.ok) {
+            throw new Error(`Chyba při odesílání na Make: ${response.status}`);
         }
 
-        console.log("✅ Načtené povely do commandList:", commandList);
+        const text = await response.text();
+        console.log("📜 Surová odpověď:", text);
+
+        try {
+            const result = JSON.parse(text);
+            console.log("✅ Přijatá odpověď:", result);
+
+            // Pracujeme jen s jednou URL, seznam není potřeba
+            if (result.url) {
+                console.log("🚀 Přesměrování na:", result.url);
+                window.location.href = result.url; // Přesměrování přímo na URL
+            } else {
+                console.error("❌ Chyba: Make nevrátil URL:", result);
+                document.getElementById('output').innerText = "⚠️ Odpověď z Make neobsahuje URL.";
+            }
+        } catch (error) {
+            console.error("❌ Chyba při parsování JSON odpovědi:", error, "Odpověď:", text);
+            document.getElementById('output').innerText = "⚠️ Chyba při zpracování odpovědi.";
+        }
 
     } catch (error) {
-        console.error("❌ Chyba při načítání povelů:", error);
+        console.error("❌ Chyba při komunikaci s Make:", error);
+        document.getElementById('output').innerText = "⚠️ Chyba při připojení.";
     }
 }
 
 
-export function executeCommand(command) {
-    console.log(`🔎 Hledám příkaz: ${command}`);
-    console.log("📜 Aktuální commandList:", commandList);
+export async function executeCommand(command) {
+    console.log(`🔎 Odesílám příkaz do Make: ${command}`);
 
     const recognizedUrl = document.getElementById("recognized-url");
 
-    if (commandList[command]) {
-        const url = commandList[command];
+    // Pošleme povel do Make a získáme odpověď
+    const url = await fetchCommands(command);
+
+    if (url) {
         console.log("✅ Otevírám:", url);
 
         if (recognizedUrl) {
@@ -42,10 +62,11 @@ export function executeCommand(command) {
 
         window.location.href = url;
     } else {
-        console.log("❌ Příkaz nenalezen v seznamu!", command);
+        console.log("❌ Příkaz nenalezen nebo Make nevrátil URL!", command);
         if (recognizedUrl) {
             recognizedUrl.textContent = `❌ Neznámý příkaz: ${command}`;
         }
     }
 }
+
 

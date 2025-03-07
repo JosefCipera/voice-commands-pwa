@@ -97,76 +97,51 @@
     };
 
     async function handleCommand(command) {
-      const words = command.split(' ').length;
-      if (words > 10) {
-        console.warn('⚠️ Příkaz je příliš dlouhý.');
-        document.getElementById('output').innerHTML = '<span class="status">Soubor nenalezen</span><br><span class="hint">Řekněte příkaz, např. "Zobraz vytížení", "Přehrát video školení", nebo "Spusť audio návod".</span>';
-        isProcessing = false;
-        return;
-      }
+      console.log("🎤 Odesílám povel na Make:", command);
 
-      // Normalizace příkazu: odstraníme extra mezery, opravíme překlepy
-      let normalizedCommand = command.toLowerCase().trim().replace(/\s+/g, ' '); // Odstraníme více mezer
-      normalizedCommand = normalizedCommand.replace('vytizení', 'vytížení'); // Opravujeme "vytizení" na "vytížení"
-      console.log(`🎙️ Normalizovaný příkaz: ${normalizedCommand}`);
-
-      const webhookUrl = "https://hook.eu1.make.com/17gn7hrtmnfgsykl52dcn2ekx15nvh1f"; // Aktualizuj na novou Webhook URL
+      const webhookUrl = "https://hook.eu1.make.com/your-webhook-url"; // Aktualizuj URL
 
       try {
-        const requestTimestamp = Date.now(); // Časová značka požadavku
-        latestRequestTimestamp = requestTimestamp; // Aktualizujeme nejnovější čas požadavku
-
-        // Přidáme timeout na požadavek (např. 10 sekund)
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000);
-
         const response = await fetch(webhookUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ Povel: normalizedCommand }),
-          signal: controller.signal // Přidáme signal pro timeout
+          body: JSON.stringify({ Povel: command })
         });
 
-        clearTimeout(timeoutId); // Zrušíme timeout, pokud požadavek dokončí dříve
+        console.log("🔍 HTTP status:", response.status);
 
-        // Zpracujeme odpověď pouze, pokud je to nejnovější požadavek
-        if (requestTimestamp !== latestRequestTimestamp) {
-          console.log('⏳ Ignoruji starý požadavek, novější požadavek již běží.');
-          return;
+        if (!response.ok) {
+          throw new Error(`Chyba při odesílání na Make: ${response.status}`);
         }
 
-        console.log("📡 HTTP status:", response.status);
-
         const text = await response.text();
+        console.log("📜 Surová odpověď:", text);
+
         try {
           const result = JSON.parse(text);
-          console.log("📡 Odpověď z Make:", result);
+          console.log("✅ Zpracovaná odpověď (JSON):", result);
 
-          // Zpracujeme odpověď pouze, pokud obsahuje URL
-          if (result.url) {
-            console.log("➡️ Zpracovávám URL:", result.url);
-            displayContent(result.url);
+          if (Array.isArray(result.url)) {
+            console.log("📋 Seznam URL detekován:", result.url);
+            // Zde můžeš zobrazit seznam, pokud chceš uživateli nabídnout více možností
+          } else if (typeof result.url === "string") {
+            console.log("🚀 Přesměrování na jednu URL:", result.url);
+            window.location.href = result.url; // Přesměrování na URL
           } else {
-            console.error("❌ URL nebyla v odpovědi nalezena:", result);
-            document.getElementById('output').innerHTML = '<span class="status">Soubor nenalezen</span><br><span class="hint">Řekněte příkaz, např. "Zobraz vytížení", "Přehrát video školení", nebo "Spusť audio návod".</span>';
+            console.error("❌ Odpověď z Make neobsahuje platnou URL:", result);
+            document.getElementById('output').innerText = "⚠️ Chybná odpověď z Make.";
           }
         } catch (error) {
-          console.error("❌ Chyba při parsování JSON odpovědi:", text);
-          document.getElementById('output').innerHTML = '<span class="status">Technická chyba</span><br><span class="hint">Zkontrolujte připojení a zkuste znovu, např. "Zobraz vytížení", "Přehrát video školení", nebo "Spusť audio návod".</span>';
+          console.error("❌ Chyba při parsování JSON odpovědi:", error, "Odpověď:", text);
+          document.getElementById('output').innerText = "⚠️ Chyba při zpracování odpovědi.";
         }
 
       } catch (error) {
-        if (error.name === 'AbortError') {
-          console.error("❌ Požadavek vypršel (timeout):", error);
-          document.getElementById('output').innerHTML = '<span class="status">Časový limit vypršel</span><br><span class="hint">Zkuste to znovu, např. "Zobraz vytížení", "Přehrát video školení", nebo "Spusť audio návod".</span>';
-        } else {
-          console.error("❌ Chyba při komunikaci s Make:", error);
-          document.getElementById('output').innerHTML = '<span class="status">Připojení selhalo</span><br><span class="hint">Zkontrolujte internet a zkuste znovu, např. "Zobraz vytížení", "Přehrát video školení", nebo "Spusť audio návod".</span>';
-        }
-      } finally {
-        isProcessing = false; // Uvolníme zámek pro další požadavky
+        console.error("❌ Chyba při komunikaci s Make:", error);
+        document.getElementById('output').innerText = "⚠️ Chyba při připojení.";
       }
     }
+
 
     function displayContent(url) {
       const output = document.getElementById('output');
