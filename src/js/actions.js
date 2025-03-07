@@ -48,25 +48,23 @@ export async function fetchCommands(command) {
 export async function executeCommand(command) {
     console.log(`🔎 Odesílám příkaz do Make: ${command}`);
 
+    if (!command || command.trim() === "") {
+        console.log("⚠️ Prázdný příkaz, neodesílám na Make.");
+        return;
+    }
+
     const recognizedUrl = document.getElementById("recognized-url");
 
     // Pošleme povel do Make a získáme odpověď
     const url = await fetchCommands(command);
 
     if (url) {
-        console.log("✅ Otevírám:", url);
-
-        if (recognizedUrl) {
-            recognizedUrl.textContent = `Otevírám: ${url}`;
-        }
-
+        console.log(`🚀 Přesměrování na: ${url}`);
         window.location.href = url;
     } else {
-        console.log("❌ Příkaz nenalezen nebo Make nevrátil URL!", command);
-        if (recognizedUrl) {
-            recognizedUrl.textContent = `❌ Neznámý příkaz: ${command}`;
-        }
+        console.log("⚠️ Make nevrátil žádnou URL.");
     }
 }
+
 
 
