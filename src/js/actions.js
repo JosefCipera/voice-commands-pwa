@@ -3,7 +3,7 @@ export let commandList = {};  // Správně exportujeme seznam povelů
 export async function fetchCommands(command) {
     console.log("🎤 Načítám URL pro příkaz:", command);
 
-    const webhookUrl = "hhttps://hook.eu1.make.com/17gn7hrtmnfgsykl52dcn2ekx15nvh1f"; // Aktualizuj URL
+    const webhookUrl = "https://hook.eu1.make.com/17gn7hrtmnfgsykl52dcn2ekx15nvh1f"; // Aktualizuj URL
 
     try {
         const response = await fetch(webhookUrl, {
