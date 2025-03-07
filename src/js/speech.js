@@ -13,8 +13,6 @@ export function startSpeechRecognition() {
     recognition.lang = 'cs-CZ';
     recognition.interimResults = false;
 
-    import { executeCommand, fetchCommands } from './actions.js';
-
     recognition.onresult = async (event) => {
         const recognizedText = event.results[0][0].transcript.trim();
         console.log("🎤 Rozpoznaný text:", recognizedText);
