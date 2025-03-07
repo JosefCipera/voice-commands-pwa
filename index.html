@@ -248,18 +248,6 @@
       }
     }
   </script>
-  <script>
-    fetch("https://hook.eu1.make.com/17gn7hrtmnfgsykl52dcn2ekx15nvh1f", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ command: "kapacit" })
-    })
-      .then(response => response.json())
-      .then(data => console.log("📜 Odpověď z Make:", data))
-      .catch(error => console.error("❌ Chyba při posílání na Make:", error));
-  </script>
 
 </body>
 
