@@ -13,17 +13,11 @@ export function startSpeechRecognition() {
     recognition.lang = 'cs-CZ';
     recognition.interimResults = false;
 
-    recognition.onresult = async function (event) {
-        const command = event.results[0][0].transcript.toLowerCase();
-        console.log("🎤 Rozpoznaný text:", command);
+    recognition.onresult = async (event) => {
+        const recognizedText = event.results[0][0].transcript.trim(); // Správně načteme text
+        console.log("🎤 Rozpoznaný text:", recognizedText);
 
-        if (firstRecognition) {
-            console.log("📡 Poprvé načítám povely z Make...");
-            await fetchCommands(recognizedText); // nebo jiné proměnné, která obsahuje rozpoznaný text
-            firstRecognition = false;
-        }
-
-        executeCommand(command);
+        await fetchCommands(recognizedText); // Nyní posíláme správný text do Make
     };
 
     recognition.start();
