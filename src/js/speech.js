@@ -19,7 +19,7 @@ export function startSpeechRecognition() {
 
         if (firstRecognition) {
             console.log("📡 Poprvé načítám povely z Make...");
-            await fetchCommands();
+            await fetchCommands(recognizedText); // nebo jiné proměnné, která obsahuje rozpoznaný text
             firstRecognition = false;
         }
 
