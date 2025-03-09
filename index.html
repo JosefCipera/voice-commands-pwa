@@ -250,43 +250,53 @@
 
     let deferredPrompt;
 
-    // Funkce pro kontrolu, zda je aplikace už nainstalovaná
-    function checkInstallation() {
-      if (window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone) {
-        document.getElementById("install-button").style.display = "none";
-      }
-    }
-
-    // PWA se nabízí k instalaci
-    window.addEventListener("beforeinstallprompt", (event) => {
-      event.preventDefault();
-      deferredPrompt = event;
+    document.addEventListener("DOMContentLoaded", () => {
       const installButton = document.getElementById("install-button");
-      installButton.style.display = "block"; // Zobrazíme tlačítko
 
-      installButton.addEventListener("click", async () => {
-        if (!deferredPrompt) return;
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
+      // Funkce pro kontrolu, zda je PWA nainstalovaná
+      function isPWAInstalled() {
+        return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone;
+      }
 
-        if (outcome === "accepted") {
-          console.log("✅ PWA byla nainstalována.");
-          installButton.style.display = "none"; // Ihned skryjeme tlačítko
-        } else {
-          console.log("❌ Uživatel odmítl instalaci.");
-        }
-        deferredPrompt = null;
+      // Pokud je už nainstalováno, skryjeme tlačítko
+      if (isPWAInstalled()) {
+        installButton.style.display = "none";
+      }
+
+      // PWA nabídka k instalaci
+      window.addEventListener("beforeinstallprompt", (event) => {
+        event.preventDefault();
+        deferredPrompt = event;
+        installButton.style.display = "block"; // Zobrazíme tlačítko instalace
+
+        installButton.addEventListener("click", async () => {
+          if (!deferredPrompt) return;
+          deferredPrompt.prompt();
+          const { outcome } = await deferredPrompt.userChoice;
+
+          if (outcome === "accepted") {
+            console.log("✅ PWA byla nainstalována.");
+            installButton.style.display = "none"; // Ihned skryjeme tlačítko
+          } else {
+            console.log("❌ Uživatel odmítl instalaci.");
+          }
+          deferredPrompt = null;
+        });
       });
-    });
 
-    // Jakmile je PWA nainstalována, okamžitě skryjeme tlačítko
-    window.addEventListener("appinstalled", () => {
-      console.log("🎉 Aplikace je nainstalovaná!");
-      document.getElementById("install-button").style.display = "none";
-    });
+      // Událost, která se spustí po instalaci
+      window.addEventListener("appinstalled", () => {
+        console.log("🎉 Aplikace je nainstalovaná!");
+        installButton.style.display = "none"; // Skryjeme tlačítko ihned po instalaci
+      });
 
-    // Zkontrolujeme instalaci při načtení stránky
-    window.addEventListener("DOMContentLoaded", checkInstallation);
+      // Extra kontrola po malé prodlevě, zda je PWA už nainstalovaná
+      setTimeout(() => {
+        if (isPWAInstalled()) {
+          installButton.style.display = "none";
+        }
+      }, 500); // Po půl sekundě ještě jednou ověříme
+    });
 
   </script>
 
