@@ -250,42 +250,43 @@
 
     let deferredPrompt;
 
-    // Detekce, zda je PWA již nainstalovaná při načtení stránky
+    // Funkce pro kontrolu, zda je aplikace už nainstalovaná
     function checkInstallation() {
       if (window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone) {
         document.getElementById("install-button").style.display = "none";
       }
     }
 
+    // PWA se nabízí k instalaci
     window.addEventListener("beforeinstallprompt", (event) => {
-      event.preventDefault(); // Zabráníme automatickému zobrazení
-      deferredPrompt = event; // Uložíme event pro pozdější použití
-
+      event.preventDefault();
+      deferredPrompt = event;
       const installButton = document.getElementById("install-button");
-      installButton.style.display = "block"; // Zobrazíme tlačítko instalace
+      installButton.style.display = "block"; // Zobrazíme tlačítko
 
-      installButton.addEventListener("click", () => {
-        deferredPrompt.prompt(); // Spustíme instalaci
-        deferredPrompt.userChoice.then((choiceResult) => {
-          if (choiceResult.outcome === "accepted") {
-            console.log("✅ PWA byla nainstalována.");
-            installButton.style.display = "none"; // Skryjeme tlačítko ihned
-          } else {
-            console.log("❌ Uživatel odmítl instalaci.");
-          }
-          deferredPrompt = null; // Resetujeme proměnnou
-        });
+      installButton.addEventListener("click", async () => {
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+
+        if (outcome === "accepted") {
+          console.log("✅ PWA byla nainstalována.");
+          installButton.style.display = "none"; // Ihned skryjeme tlačítko
+        } else {
+          console.log("❌ Uživatel odmítl instalaci.");
+        }
+        deferredPrompt = null;
       });
     });
 
-    // Událost, která se spustí po instalaci
+    // Jakmile je PWA nainstalována, okamžitě skryjeme tlačítko
     window.addEventListener("appinstalled", () => {
       console.log("🎉 Aplikace je nainstalovaná!");
-      document.getElementById("install-button").style.display = "none"; // Skryjeme tlačítko
+      document.getElementById("install-button").style.display = "none";
     });
 
-    // Zkontrolujeme, zda je aplikace nainstalovaná hned při načtení stránky
-    window.addEventListener("load", checkInstallation);
+    // Zkontrolujeme instalaci při načtení stránky
+    window.addEventListener("DOMContentLoaded", checkInstallation);
 
   </script>
 
