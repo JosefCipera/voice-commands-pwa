@@ -250,6 +250,13 @@
 
     let deferredPrompt;
 
+    // Detekce, zda je PWA již nainstalovaná při načtení stránky
+    function checkInstallation() {
+      if (window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone) {
+        document.getElementById("install-button").style.display = "none";
+      }
+    }
+
     window.addEventListener("beforeinstallprompt", (event) => {
       event.preventDefault(); // Zabráníme automatickému zobrazení
       deferredPrompt = event; // Uložíme event pro pozdější použití
@@ -262,7 +269,7 @@
         deferredPrompt.userChoice.then((choiceResult) => {
           if (choiceResult.outcome === "accepted") {
             console.log("✅ PWA byla nainstalována.");
-            installButton.style.display = "none"; // Skryjeme tlačítko po instalaci
+            installButton.style.display = "none"; // Skryjeme tlačítko ihned
           } else {
             console.log("❌ Uživatel odmítl instalaci.");
           }
@@ -271,16 +278,15 @@
       });
     });
 
-    // Detekce, zda je aplikace již nainstalovaná
+    // Událost, která se spustí po instalaci
     window.addEventListener("appinstalled", () => {
       console.log("🎉 Aplikace je nainstalovaná!");
       document.getElementById("install-button").style.display = "none"; // Skryjeme tlačítko
     });
 
-    // Kontrola po načtení stránky, jestli je PWA nainstalovaná
-    if (window.matchMedia("(display-mode: standalone)").matches) {
-      document.getElementById("install-button").style.display = "none";
-    }
+    // Zkontrolujeme, zda je aplikace nainstalovaná hned při načtení stránky
+    window.addEventListener("load", checkInstallation);
+
   </script>
 
 </body>
