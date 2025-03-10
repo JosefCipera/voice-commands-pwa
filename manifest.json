@@ -1,7 +1,7 @@
 {
   "name": "Voice Commands PWA",
   "short_name": "VoicePWA",
-  "start_url": "/voice-commands-pwa/index.html",
+  "start_url": "/index.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#4CAF50",
