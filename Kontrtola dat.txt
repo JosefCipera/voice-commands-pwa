@@ -1,0 +1,60 @@
+// config.js - Nastavení API
+const SHEET_ID = '1sxgkZ2ylb-XGeF-aqm7IN86LOU4VVx0I';
+const SHEET_NAME = 'List1'; // Změň podle názvu listu
+const API_KEY = 'AIzaSyBLmvNbI-ePMlAXNSdzEP_F6nQwYuk9uA4';
+const BASE_URL = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/`;
+
+// fetchData.js - Načtení dat
+async function fetchProductionData() {
+    const url = `${BASE_URL}${SHEET_NAME}?key=${API_KEY}`;
+    const response = await fetch(url);
+    const data = await response.json();
+    return data.values; // Vrátí pole dat
+}
+
+// processData.js - Zpracování dat
+async function checkProductionData() {
+    let data = await fetchProductionData();
+    if (!data || data.length === 0) return;
+
+    let headers = data[0];
+    let indexDoba = headers.indexOf("Průběžná doba");
+    let indexKontrola = headers.indexOf("Kontrola dat");
+
+    if (indexDoba === -1 || indexKontrola === -1) {
+        console.error("Chybí sloupce v tabulce!");
+        return;
+    }
+
+    let updates = [];
+    for (let i = 1; i < data.length; i++) {
+        let prubeznaDoba = parseFloat(data[i][indexDoba]) || 0;
+        if (prubeznaDoba !== 0) {
+            updates.push({ row: i + 1, value: "ok" });
+        }
+    }
+
+    await updateSheet(updates, indexKontrola);
+}
+
+// updateSheet.js - Aktualizace dat
+async function updateSheet(updates, colIndex) {
+    for (let update of updates) {
+        let range = `${SHEET_NAME}!${String.fromCharCode(65 + colIndex)}${update.row}`;
+        let url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${range}?valueInputOption=USER_ENTERED&key=${API_KEY}`;
+        
+        await fetch(url, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ values: [[update.value]] })
+        });
+    }
+    console.log("Data byla aktualizována.");
+}
+
+// voiceCommands.js - Spouštění přes hlasový povel
+function handleVoiceCommand(command) {
+    if (command.toLowerCase() === "kontrola dat výroby") {
+        checkProductionData();
+    }
+}
