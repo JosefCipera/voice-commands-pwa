@@ -2,18 +2,32 @@
 <html lang="cs">
 
 <head>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script type="module">
+    import { initGoogleAuth } from "./src/utils/auth.js";
+
+    window.onload = () => {
+      console.log("✅ Stránka načtena, inicializuji Google Auth...");
+      initGoogleAuth();
+    };
+  </script>
+
+  </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chytré já</title>
   <link rel="manifest" href="./manifest.json">
-  <link rel="stylesheet" href="src/css/style.css">
-  <link rel="icon" type="image/png" href="images/avatarka_bílé_pozadí.png">
+  <link rel="stylesheet" href="./styles.css">
+  <link rel="icon" type="image/png" href="./images/avatarka_bílé_pozadí.png">
 </head>
 
 <body>
+  <button id="install-button" style="opacity: 0;">📲 Instalovat PWA</button>
+
+  <div id="microphone" style="display: none;">🎤</div>
   <div class="container">
     <div class="top-half">
-      <img src="images/microphone-192.png" alt="Microphone" id="start-speech" class="mic-icon">
+      <img src="./images/microphone-192.png" alt="Microphone" id="start-speech" class="mic-icon">
 
     </div>
     <div class="bottom-half">
@@ -23,11 +37,16 @@
 
 
   </div>
-  <script src="src/js/app.js" type="module"></script>
-  <script src="src/js/install.js" type="module"></script>
+  <script src="./src/app.js" type="module"></script>
+  <script src="./src/utils/install.js" type="module"></script>
+  <script src="./src/utils/auth.js" type="module"></script>
+  <script src="./src/utils/actions.js" type="module"></script>
+  <script src="./src/utils/speech.js" type="module"></script>
+  <script type="module" src="./src/utils/config.js"></script>
+
   <script>
     if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("public/sw.js")
+      navigator.serviceWorker.register("./service-worker.js")
         .then(() => console.log("Service Worker zaregistrován!"))
         .catch((err) => console.log("Service Worker error:", err));
     }
@@ -283,6 +302,51 @@
     // ✅ Extra kontrola každou sekundu, zda je PWA aktivní
     setInterval(checkIfInstalled, 1000);
 
+  </script>
+  <script type="module">
+    import { initGoogleAuth, signInAndRunCheck } from "./src/utils/auth.js";
+    import { startSpeechRecognition } from "./src/utils/speech.js";
+
+    import * as Auth from "./src/utils/auth.js"; // ✅ Importujeme všechny funkce pod jménem Auth
+    import { updateRange } from "./src/utils/auth.js"; // ✅ Import v hlavním souboru
+
+    // console.log("📊 Globální updateRange:", updateRange); // ✅ Ověření v konzoli
+
+    window.getAccessToken = Auth.getAccessToken; // ✅ Nastavíme globální přístup
+
+    window.onload = () => {
+      console.log("🔄 Čekám na načtení Google Identity Services...");
+      Auth.initGoogleAuth();
+    };
+  </script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const installButton = document.getElementById("install-button");
+
+      if (!installButton) {
+        console.error("❌ Chyba: Nenalezen `install-button` v HTML!");
+        return;
+      }
+
+      let deferredPrompt;
+
+      window.addEventListener("beforeinstallprompt", (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        installButton.style.display = "block";
+
+        installButton.addEventListener("click", () => {
+          deferredPrompt.prompt();
+          deferredPrompt.userChoice.then((choiceResult) => {
+            if (choiceResult.outcome === "accepted") {
+              console.log("✅ Aplikace byla nainstalována.");
+            }
+            deferredPrompt = null;
+          });
+        });
+      });
+    });
 
   </script>
 
